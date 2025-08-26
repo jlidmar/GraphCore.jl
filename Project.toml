@@ -1,0 +1,13 @@
+name = "GraphCore"
+uuid = "959eb29d-3b89-4f5f-bee6-61f8037ea4e1"
+authors = ["Jack Lidmar <jlidmar@kth.se> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
