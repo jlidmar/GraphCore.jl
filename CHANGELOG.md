@@ -1,13 +1,18 @@
 # Changelog
 
+## [0.4.0]
+
+### Changed
+- **Module Restructuring**: Renamed `GraphConstruction` module to `Builders` for improved clarity and consistency
+  - Updated all internal references and documentation
+  - Simplified imports: use `GraphCore.Builders` instead of `GraphCore.GraphConstruction`
+
 ## [0.3.1]
 
 ### Added
 - **Plotting Examples**: New visualization capabilities using Plots and GraphRecipes plotting tools
   - `examples/plotting_example.jl` - Simple example
   - Integration with Plots.jl ecosystem via GraphRecipes.jl
-
-### Developer Experience
 
 ## [0.3.0]
 
@@ -48,6 +53,7 @@
 - **Graphs.jl Compatibility**: Drop-in replacement for most Graphs.jl functionality
 - **Unified Interface**: All graph types work with the same functions and syntax
 
+[0.4.0]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.4.0
 [0.3.1]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.3.1
 
 

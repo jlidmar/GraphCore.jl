@@ -1,6 +1,6 @@
 using Test
 using GraphCore
-using .GraphCore.GraphConstruction
+using .GraphCore.Builders
 
 # Add a simple unified API test
 @testset "Unified build_graph API" begin

@@ -7,7 +7,7 @@ Test graph construction methods and GraphBuilder functionality.
 
 using Test
 using GraphCore
-using GraphCore.GraphConstruction
+using GraphCore.Builders
 
 @testset "Graph Construction Tests" begin
     

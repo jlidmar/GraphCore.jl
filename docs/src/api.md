@@ -11,7 +11,7 @@ Private = false
 ## Graph Construction
 
 ```@autodocs
-Modules = [GraphCore.GraphConstruction]
+Modules = [GraphCore.Builders]
 Order   = [:type, :function]
 Private = false
 ```

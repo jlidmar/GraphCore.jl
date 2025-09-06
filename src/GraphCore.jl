@@ -65,8 +65,8 @@ public canonicalize_edges, symmetrize_edges
 # ==============================================================================
 
 # Graph Construction and Builders
-include("GraphConstruction.jl")
-using .GraphConstruction
+include("Builders.jl")
+using .Builders
 export GraphBuilder, WeightedGraphBuilder, PropertyGraphBuilder, FullGraphBuilder
 export build_from_function
 

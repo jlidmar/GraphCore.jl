@@ -31,7 +31,7 @@ GraphCore.jl
 ├── GraphInterface      # Abstract interface definition
 ├── CoreGraph           # CSR-based graphs (static, high-performance)
 ├── AdjGraph            # Adjacency list graphs (dynamic, mutable)
-└── GraphConstruction   # Builder patterns for graph construction
+└── Builders            # Builder patterns for graph construction
 ```
 
 ## Performance Characteristics

@@ -5,7 +5,7 @@ Graph Construction Builder
 Efficient builder for constructing graphs with incremental vertex/edge addition.
 Optimized for construction speed, not query performance.
 """
-module GraphConstruction
+module Builders
 
 using ..GraphCore: GraphInterface
 using ..GraphCore: CoreGraph, WeightedGraph, PropertyGraph
@@ -29,4 +29,4 @@ export erdos_renyi_graph, barabasi_albert_graph, wheel_graph, hypercubic_graph
 
 include("Generators.jl")
 
-end # module GraphConstruction
+end # module Builders

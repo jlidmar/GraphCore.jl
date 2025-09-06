@@ -905,7 +905,7 @@ function interface_summary()
 
     SUBMODULES (import explicitly):
     - GraphCore.Conversions: from_graphs_jl, to_graphs_jl, etc.
-    - GraphCore.GraphConstruction: GraphBuilder, empty_graph, complete_graph, etc.
+    - GraphCore.Builders: GraphBuilder, empty_graph, complete_graph, etc.
     """)
 end
 

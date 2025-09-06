@@ -115,7 +115,7 @@ wg = build_weighted_graph(edges, weights; directed=true)
 
 **Incrementally with GraphBuilder:**
 ```julia
-using GraphCore.GraphConstruction
+using GraphCore.Builders
 
 builder = WeightedGraphBuilder(Float64; directed=false)
 add_edge!(builder, 1, 2; weight=1.5)

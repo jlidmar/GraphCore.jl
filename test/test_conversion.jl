@@ -8,7 +8,7 @@ Test conversions between different graph types and external libraries.
 using Test
 using GraphCore
 using GraphCore.Conversions
-using GraphCore.GraphConstruction: build_graph
+using GraphCore.Builders: build_graph
 using Graphs: Graph, SimpleGraph
 
 function test_conversions()
