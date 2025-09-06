@@ -26,7 +26,7 @@
   - `edges(g)` displays edge count, graph type, and preview: "EdgeIterator over 5 edges from CoreGraph (undirected): (1,2), (1,3), (2,3), ..."
   - Clear distinction between `edges(g)` and `all_directed_edges(g)`
 
-### Changed  
+### Changed
 - **Mutable CoreGraph and WeightedGraph**: These graph types now support in-place modifications
 - **Cleaner Documentation**: Simplified and organized help text for `build_graph` functions
   - Each graph type's docs now focus on when to use it
@@ -42,7 +42,7 @@
 ### Initial Release
 - **Multiple Graph Storage Options**: Choose the right format for your use case
   - `CoreGraph` - Compressed storage for static graphs and fast queries
-  - `AdjGraph` - Flexible storage for dynamic graphs requiring frequent modifications  
+  - `AdjGraph` - Flexible storage for dynamic graphs requiring frequent modifications
   - `WeightedGraph` - Built-in edge weight support
   - `PropertyGraph` - Store custom data on vertices and edges
 - **Graphs.jl Compatibility**: Drop-in replacement for most Graphs.jl functionality

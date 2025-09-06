@@ -9,14 +9,14 @@ mutable struct GraphBuilder{V,E,W} <: GraphInterface
     edges::Vector{Tuple{Int32,Int32}}
     edge_properties::Vector{E}
     edge_weights::Vector{W}
-    
+
     # Vertex storage
     vertex_properties::Vector{V}
-    
+
     # Construction settings
     directed::Bool
     max_vertex::Int32  # Track highest vertex index seen
-    
+
     function GraphBuilder{V,E,W}(; directed::Bool = true) where {V,E,W}
         new{V,E,W}(
             Tuple{Int32,Int32}[],
@@ -62,7 +62,7 @@ function add_vertex!(builder::GraphBuilder{V,E,W}, prop::V) where {V,E,W}
 end
 
 """
-    add_edge!(builder::GraphBuilder, u::Integer, v::Integer; 
+    add_edge!(builder::GraphBuilder, u::Integer, v::Integer;
               edge_property=nothing, weight=nothing) -> Int32
 
 Add an edge with optional properties and weights using keyword arguments.
@@ -73,7 +73,7 @@ Returns the edge index (1-based).
 # Basic edge
 add_edge!(builder, 1, 2)
 
-# Weighted edge  
+# Weighted edge
 add_edge!(builder, 1, 2; weight=1.5)
 
 # Edge with property
@@ -83,10 +83,10 @@ add_edge!(builder, 1, 2; edge_property="connection")
 add_edge!(builder, 1, 2; edge_property="highway", weight=2.5)
 ```
 """
-function add_edge!(builder::GraphBuilder{V,E,W}, u::Integer, v::Integer; 
+function add_edge!(builder::GraphBuilder{V,E,W}, u::Integer, v::Integer;
                    edge_property=nothing, weight=nothing) where {V,E,W}
     u32, v32 = Int32(u), Int32(v)
-    
+
     # if max(u32, v32) > builder.max_vertex
     #     throw(ArgumentError("Vertex indices of edge ($u,$v) exceeds current max vertex $(num_vertices(builder)). Add vertices first."))
     # end
@@ -95,7 +95,7 @@ function add_edge!(builder::GraphBuilder{V,E,W}, u::Integer, v::Integer;
 
     # Add edge
     push!(builder.edges, (u32, v32))
-    
+
     # Validate and add properties
     if E !== Nothing
         if edge_property === nothing
@@ -111,7 +111,7 @@ function add_edge!(builder::GraphBuilder{V,E,W}, u::Integer, v::Integer;
             throw(ArgumentError("edge_property not supported for this builder type"))
         end
     end
-    
+
     # Validate and add weights
     if W !== Nothing
         if weight === nothing
@@ -127,7 +127,7 @@ function add_edge!(builder::GraphBuilder{V,E,W}, u::Integer, v::Integer;
             throw(ArgumentError("weight not supported for this builder type"))
         end
     end
-    
+
     return Int32(length(builder.edges))
 end
 
@@ -149,23 +149,23 @@ CoreGraph, WeightedGraph{W}, PropertyGraph{G,V,E}.
 """
 function build_graph(builder::GraphBuilder{V,E,W}) where {V,E,W}
     nv = num_vertices(builder)
-    
+
     # Pad vertex properties if needed
     if V !== Nothing && length(builder.vertex_properties) < nv
         # Fill missing vertex properties with default (requires V to support zero())
         resize!(builder.vertex_properties, nv)
     end
-    
+
     # Choose appropriate graph type and build
     if V === Nothing && E === Nothing && W === Nothing
         # Pure topology
         return build_core_graph(builder.edges; directed=builder.directed)
-        
+
     elseif V === Nothing && E === Nothing && W !== Nothing
         # Weighted only
-        return build_weighted_graph(builder.edges, builder.edge_weights; 
+        return build_weighted_graph(builder.edges, builder.edge_weights;
                                    directed=builder.directed)
-        
+
     else
         # Property graph (with or without weights)
         if W === Nothing
@@ -176,11 +176,11 @@ function build_graph(builder::GraphBuilder{V,E,W}) where {V,E,W}
             core = build_weighted_graph(builder.edges, builder.edge_weights;
                                        directed=builder.directed)
         end
-        
+
         # Ensure we have vertex properties
         vertex_props = V === Nothing ? fill(nothing, nv) : builder.vertex_properties
         edge_props = E === Nothing ? fill(nothing, length(builder.edges)) : builder.edge_properties
-        
+
         return PropertyGraph(core, vertex_props, edge_props)
     end
 end
@@ -223,18 +223,18 @@ end
 
 Build a graph by calling vertex_fn(i) for each vertex and edge_fn(u,v) for potential edges.
 """
-function build_from_function(vertex_fn::Function, edge_fn::Function, nv::Int; 
+function build_from_function(vertex_fn::Function, edge_fn::Function, nv::Int;
                             directed::Bool = true)
     V = typeof(vertex_fn(1))
     E = typeof(edge_fn(1, 2))
-    
+
     builder = PropertyGraphBuilder{V,E}(directed=directed)
-    
+
     # Add vertices
     for i in 1:nv
         add_vertex!(builder, vertex_fn(i))
     end
-    
+
     # Add edges
     for u in 1:nv, v in (directed ? (1:nv) : (u:nv))
         if u != v  # No self-loops
@@ -244,6 +244,6 @@ function build_from_function(vertex_fn::Function, edge_fn::Function, nv::Int;
             end
         end
     end
-    
+
     return build_graph(builder)
 end

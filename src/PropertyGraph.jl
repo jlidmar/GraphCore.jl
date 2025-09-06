@@ -28,7 +28,7 @@ Universal property graph that wraps any base graph type with typed vertex and ed
 
 # Type Parameters
 - `G<:GraphInterface`: Base graph type (CoreGraph, WeightedGraph, AdjGraph, etc.)
-- `V`: Vertex property type  
+- `V`: Vertex property type
 - `E`: Edge property type
 
 # Design Benefits
@@ -41,7 +41,7 @@ Universal property graph that wraps any base graph type with typed vertex and ed
 # Usage Patterns
 ```julia
 # Static analysis with CoreGraph base
-core_g = build_core_graph(edges; directed=false)  
+core_g = build_core_graph(edges; directed=false)
 vertex_labels = ["Alice", "Bob", "Charlie"]
 edge_types = ["friend", "colleague", "family"]
 pg = PropertyGraph(core_g, vertex_labels, edge_types)
@@ -71,7 +71,7 @@ pg = PropertyGraph(weighted_g, vertex_labels, edge_types)
 adj_pg = PropertyGraph(build_adj_graph(edges), v_props, e_props)
 add_edge!(adj_pg, u, v, edge_prop)  # ✅ Works - AdjGraph supports mutations
 
-# Mutations fail gracefully when base graph doesn't support them  
+# Mutations fail gracefully when base graph doesn't support them
 core_pg = PropertyGraph(build_core_graph(edges), v_props, e_props)
 add_edge!(core_pg, u, v, edge_prop)  # ❌ MethodError - CoreGraph is immutable
 
@@ -91,8 +91,8 @@ struct PropertyGraph{G<:GraphInterface,V,E} <: PropertyGraphInterface{V,E}
     core::G                           # Base graph
     vertex_properties::Vector{V}      # Properties for each vertex
     edge_properties::Vector{E}        # Properties for each undirected edge
-    
-    function PropertyGraph{G,V,E}(core::G, vertex_properties::Vector{V}, 
+
+    function PropertyGraph{G,V,E}(core::G, vertex_properties::Vector{V},
                                   edge_properties::Vector{E}) where {G,V,E}
         @assert length(vertex_properties) == num_vertices(core)
         @assert length(edge_properties) == num_edges(core)
@@ -101,27 +101,27 @@ struct PropertyGraph{G<:GraphInterface,V,E} <: PropertyGraphInterface{V,E}
 end
 
 # Convenience constructor
-PropertyGraph(core::G, vertex_properties::Vector{V}, edge_properties::Vector{E}) where {G,V,E} = 
+PropertyGraph(core::G, vertex_properties::Vector{V}, edge_properties::Vector{E}) where {G,V,E} =
     PropertyGraph{G,V,E}(core, vertex_properties, edge_properties)
 
 """
     build_graph(::Type{PropertyGraph{G,V,E}}, edges; kwargs...) where {G,V,E}
 
-Build a property graph with vertex and edge properties. The underlying graph type G 
+Build a property graph with vertex and edge properties. The underlying graph type G
 determines performance characteristics (CoreGraph for CSR, AdjGraph for adjacency list).
 
 # Arguments
 - `edges`: Vector of (u,v) tuples/pairs representing graph edges
 - `directed=true`: Whether the graph is directed
 - `vertex_properties=[]`: Properties for each vertex (type V)
-- `edge_properties=[]`: Properties for each edge (type E)  
+- `edge_properties=[]`: Properties for each edge (type E)
 - `weights=[]`: Edge weights (optional)
 - `validate=true`: Whether to validate inputs
 
 # Examples
 ```julia
 # Property graph with CoreGraph backend
-g = build_graph(PropertyGraph{CoreGraph,String,String}, [(1,2), (2,3)]; 
+g = build_graph(PropertyGraph{CoreGraph,String,String}, [(1,2), (2,3)];
                 vertex_properties=["A", "B", "C"], edge_properties=["e1", "e2"])
 
 # Property graph with AdjGraph backend for dynamic use
@@ -129,7 +129,7 @@ g = build_graph(PropertyGraph{AdjGraph,Int,Symbol}, [(1,2), (2,3)];
                 vertex_properties=[1, 2, 3], edge_properties=[:a, :b])
 ```
 """
-function build_graph(::Type{PropertyGraph{G,V,E}}, 
+function build_graph(::Type{PropertyGraph{G,V,E}},
                      edges;
                      directed::Bool=true,
                      n::Integer=0,
@@ -140,11 +140,11 @@ function build_graph(::Type{PropertyGraph{G,V,E}},
 
     # Build the underlying graph first
     base_graph = build_graph(G, edges; directed=directed, n=n, weights=weights, validate=validate)
-    
+
     # Validate property array lengths
     num_vertices_count = num_vertices(base_graph)
     num_edges_count = num_edges(base_graph)
-    
+
     if validate
         if !isempty(vertex_properties) && length(vertex_properties) != num_vertices_count
             throw(ArgumentError("vertex_properties length ($(length(vertex_properties))) must match number of vertices ($num_vertices_count)"))
@@ -153,11 +153,11 @@ function build_graph(::Type{PropertyGraph{G,V,E}},
             throw(ArgumentError("edge_properties length ($(length(edge_properties))) must match number of edges ($num_edges_count)"))
         end
     end
-    
+
     # Fill with default values if empty
     v_props = isempty(vertex_properties) ? fill(zero(V), num_vertices_count) : collect(vertex_properties)
     e_props = isempty(edge_properties) ? fill(zero(E), num_edges_count) : collect(edge_properties)
-    
+
     # Create PropertyGraph
     return PropertyGraph(base_graph, v_props, e_props)
 end
@@ -256,7 +256,7 @@ function add_edge!(g::PropertyGraph{G,V,E}, u::Integer, v::Integer, edge_prop::E
 end
 
 """
-    add_edge!(g::PropertyGraph{<:WeightedGraphInterface,V,E}, u::Integer, v::Integer, 
+    add_edge!(g::PropertyGraph{<:WeightedGraphInterface,V,E}, u::Integer, v::Integer,
               weight::W, edge_prop::E) -> Int32
 
 Add a weighted edge from u to v with the specified weight and edge property.
@@ -264,7 +264,7 @@ Returns the edge index of the newly added edge, or 0 if edge already exists.
 
 Only available when the base graph type supports weighted `add_edge!`.
 """
-function add_edge!(g::PropertyGraph{<:WeightedGraphInterface{W},V,E}, u::Integer, v::Integer, 
+function add_edge!(g::PropertyGraph{<:WeightedGraphInterface{W},V,E}, u::Integer, v::Integer,
                    weight::W, edge_prop::E) where {W,V,E}
     edge_idx = add_edge!(g.core, u, v, weight)
     if edge_idx > 0
@@ -290,7 +290,7 @@ function remove_vertex!(g::PropertyGraph, v::Integer)
     if success
         # Remove vertex property
         deleteat!(g.vertex_properties, v)
-        
+
         # Remove edge properties for all edges incident to v
         # Note: The base graph's remove_vertex! handles the complex edge removal logic
         # We just need to synchronize our edge_properties array
@@ -320,7 +320,7 @@ function remove_edge!(g::PropertyGraph, u::Integer, v::Integer)
     # Get the edge index before removal for property cleanup
     edge_idx = find_edge_index(g.core, u, v)
     success = remove_edge!(g.core, u, v)
-    
+
     if success && edge_idx > 0
         # Remove the corresponding edge property
         deleteat!(g.edge_properties, edge_idx)
@@ -329,7 +329,7 @@ function remove_edge!(g::PropertyGraph, u::Integer, v::Integer)
 end
 
 # ==============================================================================
-# WEIGHT MUTATION (Available when base weighted graph supports it)  
+# WEIGHT MUTATION (Available when base weighted graph supports it)
 # ==============================================================================
 
 """
@@ -376,8 +376,8 @@ function to_property_graph(g::PropertyGraphInterface{V,E}) where {V,E}
     nv = num_vertices(g)
     vertex_props = collect(vertex_properties(g))
     edge_props = collect(edge_properties(g))
-    
-    return build_property_graph(edge_list, vertex_props, edge_props; 
+
+    return build_property_graph(edge_list, vertex_props, edge_props;
                                directed=is_directed_graph(g), n=nv)
 end
 
@@ -405,7 +405,7 @@ Build a PropertyGraph with CoreGraph backend.
 
 # Arguments
 - `edges`: Vector of (u,v) tuples representing graph edges
-- `vertex_properties`: Vector of vertex properties  
+- `vertex_properties`: Vector of vertex properties
 - `edge_properties`: Vector of edge properties
 - `directed=true`: Whether to build a directed graph
 - `kwargs...`: Additional arguments passed to underlying graph construction
@@ -422,9 +422,9 @@ function build_property_graph(edges,
                              vertex_properties::AbstractVector{V},
                              edge_properties::AbstractVector{E};
                              directed::Bool=true, kwargs...) where {V,E}
-    return build_graph(PropertyGraph{CoreGraph,V,E}, edges; 
+    return build_graph(PropertyGraph{CoreGraph,V,E}, edges;
                       directed=directed,
-                      vertex_properties=vertex_properties, 
+                      vertex_properties=vertex_properties,
                       edge_properties=edge_properties, kwargs...)
 end
 
@@ -435,7 +435,7 @@ Build a PropertyGraph with AdjGraph backend (supports efficient mutations).
 
 # Arguments
 - `edges`: Vector of (u,v) tuples representing graph edges
-- `vertex_properties`: Vector of vertex properties  
+- `vertex_properties`: Vector of vertex properties
 - `edge_properties`: Vector of edge properties
 - `directed=true`: Whether to build a directed graph
 - `kwargs...`: Additional arguments passed to underlying graph construction
@@ -448,9 +448,9 @@ edge_props = [:a, :b]
 pg = build_property_adj_graph(edges, vertex_props, edge_props; directed=false)
 ```
 """
-function build_property_adj_graph(edges, 
-                                  vertex_properties::AbstractVector{V}, 
-                                  edge_properties::AbstractVector{E}; 
+function build_property_adj_graph(edges,
+                                  vertex_properties::AbstractVector{V},
+                                  edge_properties::AbstractVector{E};
                                   directed::Bool=true, kwargs...) where {V,E}
     adj_graph = build_graph(AdjGraph, edges; directed=directed, kwargs...)
     return PropertyGraph{typeof(adj_graph),V,E}(adj_graph, vertex_properties, edge_properties)

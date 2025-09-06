@@ -458,11 +458,11 @@ Preserves the directedness and all weights of the original graph.
 function to_weighted_graph(g::WeightedGraphInterface{W}) where W
     # Build CSR offsets (same as to_core_graph)
     vertex_offsets = Int32[1; accumulate(+, degree(g, v) for v in vertices(g); init=one(Int32))]
-    
+
     # Build neighbors and weights arrays using reduce
     neighbors = reduce(vcat, [neighbor_indices(g, v) for v in vertices(g)])
     weights = reduce(vcat, [edge_weights(g, v) for v in vertices(g)])
-    
+
     if is_directed_graph(g)
         return WeightedGraph{W,true}(vertex_offsets, neighbors, weights, num_edges(g))
     else
@@ -562,7 +562,7 @@ Build a graph from an edge list with comprehensive validation and flexible optio
 
 # Arguments
 - `edges`: Vector of (u,v) tuples/pairs representing graph edges
-- `directed=true`: Whether to build a directed graph  
+- `directed=true`: Whether to build a directed graph
 - `n=0`: Number of vertices (0 = auto-detect from edges)
 - `weights=[]`: Edge weights (for WeightedGraph types)
 - `validate=true`: Enable input validation (recommended for safety)
@@ -573,7 +573,7 @@ Build a graph from an edge list with comprehensive validation and flexible optio
 g = build_graph(CoreGraph, [(1,2), (2,3)]; directed=false)
 wg = build_graph(WeightedGraph{Float64}, [(1,2), (2,3)]; weights=[1.5, 2.0], directed=false)
 
-# Graph with isolated vertices  
+# Graph with isolated vertices
 g = build_graph(CoreGraph, [(1,2)]; n=5, directed=false)  # Creates isolated vertices 3,4,5
 
 # High-performance mode (skip validation)

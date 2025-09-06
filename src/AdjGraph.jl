@@ -508,7 +508,7 @@ This is an idiomatic Julia alternative to `to_adj_graph(g)`.
 # Constructor style (idiomatic)
 adj_g = AdjGraph(core_graph)
 
-# Equivalent to conversion function  
+# Equivalent to conversion function
 adj_g = to_adj_graph(core_graph)
 ```
 """
@@ -583,7 +583,7 @@ end
 
 Build adjacency list graph optimized for dynamic modifications and mutations.
 
-# Arguments  
+# Arguments
 - `edges`: Vector of (u,v) tuples/pairs representing graph edges
 - `directed=true`: Whether to build a directed graph
 - `weights=[]`: Edge weights (for WeightedAdjGraph types)

@@ -2,7 +2,7 @@
 
 function empty_graph(n::Integer; directed::Bool=false)
     # Create empty edge list and n vertices
-    return build_graph(CoreGraph, Tuple{Int,Int}[]; 
+    return build_graph(CoreGraph, Tuple{Int,Int}[];
                       directed=directed, n=n)
 end
 
@@ -34,7 +34,7 @@ end
 function grid_graph(m::Integer, n::Integer; directed::Bool=false)
     # Create proper grid edges (adjacent cells)
     edges = Tuple{Int,Int}[]
-    
+
     # Add horizontal edges
     for i in 1:m
         for j in 1:n-1
@@ -43,7 +43,7 @@ function grid_graph(m::Integer, n::Integer; directed::Bool=false)
             push!(edges, (u, v))
         end
     end
-    
+
     # Add vertical edges
     for i in 1:m-1
         for j in 1:n
@@ -52,7 +52,7 @@ function grid_graph(m::Integer, n::Integer; directed::Bool=false)
             push!(edges, (u, v))
         end
     end
-    
+
     return build_core_graph(edges; directed=directed)
 end
 

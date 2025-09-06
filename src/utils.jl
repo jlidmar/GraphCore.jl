@@ -3,7 +3,7 @@ Graph Utility Functions
 =======================
 
 Utility functions for edge format conversions and graph preprocessing.
-These functions are marked as `public` but not exported, meaning they can be 
+These functions are marked as `public` but not exported, meaning they can be
 accessed as `GraphCore.canonicalize_edges()` etc. without polluting the namespace.
 
 # Edge Format Conversions
@@ -12,7 +12,7 @@ accessed as `GraphCore.canonicalize_edges()` etc. without polluting the namespac
 For undirected graphs, canonical format means each edge (u,v) appears once with u ≤ v.
 This is the standard input format for most graph construction functions.
 
-## Symmetric Format  
+## Symmetric Format
 Symmetric format includes both directions (u,v) and (v,u) for undirected edges.
 This format is sometimes used in datasets or when converting from directed representations.
 
@@ -67,7 +67,7 @@ canonical = GraphCore.canonicalize_edges(edges)
 function canonicalize_edges(edges)
     canonical = Tuple{Int,Int}[]
     seen = Set{Tuple{Int,Int}}()
-    
+
     for (u, v) in edges
         edge = u ≤ v ? (u, v) : (v, u)
         if edge ∉ seen
@@ -75,7 +75,7 @@ function canonicalize_edges(edges)
             push!(seen, edge)
         end
     end
-    
+
     return canonical
 end
 
@@ -107,11 +107,11 @@ function canonicalize_edges(edges, weights::AbstractVector{W}) where W
     if length(edges) != length(weights)
         throw(ArgumentError("edges and weights must have same length"))
     end
-    
+
     canonical_edges = Tuple{Int,Int}[]
     canonical_weights = W[]
     seen = Set{Tuple{Int,Int}}()
-    
+
     for (idx, (u, v)) in enumerate(edges)
         edge = u ≤ v ? (u, v) : (v, u)
         if edge ∉ seen
@@ -120,7 +120,7 @@ function canonicalize_edges(edges, weights::AbstractVector{W}) where W
             push!(seen, edge)
         end
     end
-    
+
     return canonical_edges, canonical_weights
 end
 
@@ -154,14 +154,14 @@ Self-loops (u,u) are not duplicated to avoid redundancy.
 """
 function symmetrize_edges(edges)
     symmetric = Tuple{Int,Int}[]
-    
+
     for (u, v) in edges
         push!(symmetric, (u, v))
         if u != v  # Avoid duplicate self-loops
             push!(symmetric, (v, u))
         end
     end
-    
+
     return symmetric
 end
 
@@ -186,7 +186,7 @@ weight matrix suitable for undirected graph algorithms.
 edges = [(1,2), (2,3)]
 weights = [1.5, 2.0]
 symmetric_edges, symmetric_weights = GraphCore.symmetrize_edges(edges, weights)
-# Result: 
+# Result:
 # edges = [(1,2), (2,1), (2,3), (3,2)]
 # weights = [1.5, 1.5, 2.0, 2.0]
 ```
@@ -195,21 +195,21 @@ function symmetrize_edges(edges, weights::AbstractVector{W}) where W
     if length(edges) != length(weights)
         throw(ArgumentError("edges and weights must have same length"))
     end
-    
+
     symmetric_edges = Tuple{Int,Int}[]
     symmetric_weights = W[]
-    
+
     for (idx, (u, v)) in enumerate(edges)
         weight = weights[idx]
-        
+
         push!(symmetric_edges, (u, v))
         push!(symmetric_weights, weight)
-        
+
         if u != v
             push!(symmetric_edges, (v, u))
             push!(symmetric_weights, weight)
         end
     end
-    
+
     return symmetric_edges, symmetric_weights
 end

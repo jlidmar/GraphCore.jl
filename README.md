@@ -24,7 +24,7 @@ using GraphCore
 edge_list = [(1,2), (2,3), (1,3)]
 g = build_graph(CoreGraph, edge_list; directed=false)
 
-# Weighted graph  
+# Weighted graph
 weights = [1.0, 2.0, 1.5]
 wg = build_graph(WeightedGraph{Float64}, edge_list; weights=weights, directed=false)
 
@@ -32,8 +32,8 @@ wg = build_graph(WeightedGraph{Float64}, edge_list; weights=weights, directed=fa
 adj_g = AdjGraph(g)           # Convert to adjacency list for mutations
 core_g = CoreGraph(adj_g)     # Convert back to CSR format
 
-# Graph mutations (supported on CoreGraph and WeightedGraph!)
-add_vertex!(g)                # Add isolated vertex
+# Graph mutations (more efficient on AdjGraph)
+add_vertex!(g)               # Add isolated vertex
 add_edge!(g, 1, 4)           # Add new edge
 remove_edge!(g, 2, 3)        # Remove existing edge
 
@@ -52,7 +52,7 @@ if has_vertex(g, v)
     end
 end
 
-# Weighted neighbor iteration  
+# Weighted neighbor iteration
 for (neighbor, weight) in neighbor_weights(wg, 1)
     println("Edge to $neighbor with weight $weight")
 end
@@ -63,7 +63,7 @@ end
 - **High Performance**: CSR storage for cache-efficient traversal (~2-3ns core operations)
 - **Safety First**: Julia-idiomatic bounds checking with `@inbounds` optimization escape hatch
 - **Type Safety**: Parametric types catch errors at compile time
-- **Flexible Storage**: Choose between static (CoreGraph) and mutable (AdjGraph) representations  
+- **Flexible Storage**: Choose between static (CoreGraph) and mutable (AdjGraph) representations
 - **In-Place Mutations**: All graph types support efficient mutations
 - **Easy Conversions**: Idiomatic constructors for switching between graph types
 - **Property Support**: Built-in vertex and edge properties
@@ -90,7 +90,7 @@ shortest_paths = dijkstra_shortest_paths(g, 1)  # Works directly!
 
 See the [full documentation](docs/src/index.md) for:
 - Design philosophy and architecture
-- Detailed usage examples  
+- Detailed usage examples
 - Performance characteristics
 - Complete API reference
 

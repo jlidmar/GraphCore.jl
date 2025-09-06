@@ -55,20 +55,20 @@ struct HypercubicLattice{D,T<:Integer} <: GraphInterface
     periodic::NTuple{D,Bool}     # Periodic boundary conditions per dimension
     total_vertices::Int32        # Cache for num_vertices
     total_edges::Int32          # Cache for num_edges
-    
-    function HypercubicLattice{D,T}(sizes::NTuple{D,T}; 
+
+    function HypercubicLattice{D,T}(sizes::NTuple{D,T};
                                    periodic::NTuple{D,Bool} = ntuple(i -> false, D)) where {D,T<:Integer}
-        
+
         if D < 1
             throw(ArgumentError("Dimension must be positive, got $D"))
         end
-        
+
         if any(s ≤ 0 for s in sizes)
             throw(ArgumentError("All sizes must be positive, got $sizes"))
         end
-        
+
         total_vertices = Int32(prod(sizes))
-        
+
         # Calculate total edges
         total_edges = Int32(0)
         for dim in 1:D
@@ -80,7 +80,7 @@ struct HypercubicLattice{D,T<:Integer} <: GraphInterface
             end
             total_edges += edges_in_dim
         end
-        
+
         new{D,T}(sizes, periodic, total_vertices, total_edges)
     end
 end
@@ -95,7 +95,7 @@ HypercubicLattice(sizes::Vararg{T,D}; kwargs...) where {D,T} = HypercubicLattice
 
 Create a 2D grid lattice.
 """
-Grid2D(width::Integer, height::Integer; periodic=(false, false)) = 
+Grid2D(width::Integer, height::Integer; periodic=(false, false)) =
     HypercubicLattice{2,Int}((width, height); periodic=periodic)
 
 """
@@ -103,7 +103,7 @@ Grid2D(width::Integer, height::Integer; periodic=(false, false)) =
 
 Create a 3D cubic lattice.
 """
-Grid3D(width::Integer, height::Integer, depth::Integer; periodic=(false, false, false)) = 
+Grid3D(width::Integer, height::Integer, depth::Integer; periodic=(false, false, false)) =
     HypercubicLattice{3,Int}((width, height, depth); periodic=periodic)
 
 """
@@ -111,7 +111,7 @@ Grid3D(width::Integer, height::Integer, depth::Integer; periodic=(false, false, 
 
 Create a 1D chain lattice.
 """
-Chain1D(length::Integer; periodic=false) = 
+Chain1D(length::Integer; periodic=false) =
     HypercubicLattice{1,Int}((length,); periodic=(periodic,))
 
 # ==============================================================================
@@ -121,7 +121,7 @@ Chain1D(length::Integer; periodic=false) =
 """Number of vertices in the lattice."""
 num_vertices(g::HypercubicLattice) = g.total_vertices
 
-"""Number of edges in the lattice.""" 
+"""Number of edges in the lattice."""
 num_edges(g::HypercubicLattice) = g.total_edges
 
 """Number of directed edges (same as undirected for lattices)."""
@@ -140,22 +140,22 @@ function has_edge(g::HypercubicLattice{D,T}, u::Integer, v::Integer) where {D,T}
     if !has_vertex(g, u) || !has_vertex(g, v)
         return false
     end
-    
+
     coord_u = vertex_to_coord(g, u)
     coord_v = vertex_to_coord(g, v)
-    
+
     # Check if they differ by exactly 1 in exactly one dimension
     diff_count = 0
     diff_dim = 0
-    
+
     for dim in 1:D
         diff = abs(coord_u[dim] - coord_v[dim])
-        
+
         if g.periodic[dim]
             # Handle periodic boundary: distance is min(diff, size - diff)
             diff = min(diff, g.sizes[dim] - diff)
         end
-        
+
         if diff == 1
             diff_count += 1
             diff_dim = dim
@@ -163,7 +163,7 @@ function has_edge(g::HypercubicLattice{D,T}, u::Integer, v::Integer) where {D,T}
             return false  # Too far apart
         end
     end
-    
+
     return diff_count == 1
 end
 
@@ -174,10 +174,10 @@ function neighbor_indices(g::HypercubicLattice{D,T}, v::Integer) where {D,T}
     if !has_vertex(g, v)
         throw(BoundsError("Vertex $v out of bounds for lattice with $(num_vertices(g)) vertices"))
     end
-    
+
     coord = vertex_to_coord(g, v)
     neighbors = Int32[]
-    
+
     # Check each dimension
     for dim in 1:D
         # Forward neighbor
@@ -190,8 +190,8 @@ function neighbor_indices(g::HypercubicLattice{D,T}, v::Integer) where {D,T}
             new_coord_wrap = ntuple(i -> i == dim ? T(0) : coord[i], D)
             push!(neighbors, coord_to_vertex(g, new_coord_wrap))
         end
-        
-        # Backward neighbor  
+
+        # Backward neighbor
         new_coord_backward = ntuple(i -> i == dim ? coord[i] - 1 : coord[i], D)
         if coord[dim] > 0
             # Normal case: within bounds
@@ -202,36 +202,36 @@ function neighbor_indices(g::HypercubicLattice{D,T}, v::Integer) where {D,T}
             push!(neighbors, coord_to_vertex(g, new_coord_wrap))
         end
     end
-    
+
     return neighbors
 end
 
-"""Find edge index (undirected).""" 
+"""Find edge index (undirected)."""
 function find_edge_index(g::HypercubicLattice{D,T}, u::Integer, v::Integer) where {D,T}
     if !has_edge(g, u, v)
         return Int32(0)  # Edge doesn't exist
     end
-    
+
     # For lattices, we can compute edge index mathematically
     # This is complex but deterministic - simpler to use a lookup table
     # For now, we'll use a simple sequential numbering
     min_vertex, max_vertex = minmax(u, v)
     coord_min = vertex_to_coord(g, min_vertex)
     coord_max = vertex_to_coord(g, max_vertex)
-    
+
     # Find which dimension differs
     diff_dim = findfirst(i -> coord_min[i] != coord_max[i], 1:D)
-    
+
     # Compute edge index based on position and dimension
     edge_idx = Int32(1)
     for dim in 1:diff_dim-1
         edge_idx += _edges_in_dimension(g, dim)
     end
-    
+
     # Add offset within this dimension
     linear_coord = _coord_to_linear_in_slice(g, coord_min, diff_dim)
     edge_idx += linear_coord
-    
+
     return edge_idx
 end
 
@@ -255,17 +255,17 @@ function vertex_to_coord(g::HypercubicLattice{D,T}, v::Integer) where {D,T}
     if !has_vertex(g, v)
         throw(BoundsError("Vertex $v out of bounds"))
     end
-    
+
     # Convert to 0-based indexing
     idx = v - 1
     coords = Vector{T}(undef, D)
-    
+
     # Row-major order: last dimension varies fastest
     for dim in D:-1:1
         coords[dim] = T(idx % g.sizes[dim])
         idx ÷= g.sizes[dim]
     end
-    
+
     return NTuple{D,T}(coords)
 end
 
@@ -281,13 +281,13 @@ function coord_to_vertex(g::HypercubicLattice{D,T}, coord::NTuple{D,T}) where {D
             throw(BoundsError("Coordinate $coord out of bounds for lattice with sizes $(g.sizes)"))
         end
     end
-    
+
     # Row-major conversion
     idx = 0
     for dim in 1:D
         idx = idx * g.sizes[dim] + coord[dim]
     end
-    
+
     return Int32(idx + 1)  # Convert to 1-based indexing
 end
 
@@ -310,14 +310,14 @@ function _coord_to_linear_in_slice(g::HypercubicLattice{D,T}, coord::NTuple{D,T}
     # This is a simplified version - full implementation would be more complex
     linear = 0
     multiplier = 1
-    
+
     for dim in D:-1:1
         if dim != varying_dim
             linear += coord[dim] * multiplier
             multiplier *= g.sizes[dim]
         end
     end
-    
+
     return Int32(linear + 1)
 end
 
@@ -346,7 +346,7 @@ Accounts for periodic boundary conditions.
 function lattice_distance(g::HypercubicLattice{D,T}, u::Integer, v::Integer) where {D,T}
     coord_u = vertex_to_coord(g, u)
     coord_v = vertex_to_coord(g, v)
-    
+
     total_distance = 0.0
     for dim in 1:D
         diff = abs(coord_u[dim] - coord_v[dim])
@@ -355,7 +355,7 @@ function lattice_distance(g::HypercubicLattice{D,T}, u::Integer, v::Integer) whe
         end
         total_distance += diff
     end
-    
+
     return total_distance
 end
 
@@ -379,7 +379,7 @@ Fully inlined and branch-free for maximum performance.
 @inline function vertex_to_coord(g::HypercubicLattice{D,T}, v::Integer) where {D,T}
     # Use unsafe indexing for performance - bounds checking done at higher level
     idx = v - 1  # Convert to 0-based
-    
+
     # Unroll the loop for small dimensions (most common cases)
     if D == 1
         return (T(idx),)
@@ -440,11 +440,11 @@ Returns a stack-allocated vector for maximum performance.
 """
 @inline function neighbor_indices(g::HypercubicLattice{D,T}, v::Integer) where {D,T}
     coord = vertex_to_coord(g, v)
-    
+
     # Pre-allocate with maximum possible neighbors (2D)
     neighbors = MVector{2*D,Int32}(undef)
     count = 0
-    
+
     # Unroll for common dimensions
     if D == 1
         count = _compute_neighbors_1d!(neighbors, g, coord, count)
@@ -455,7 +455,7 @@ Returns a stack-allocated vector for maximum performance.
     else
         count = _compute_neighbors_nd!(neighbors, g, coord, count)
     end
-    
+
     # Return only the valid neighbors
     return SVector{count,Int32}(neighbors[1:count])
 end
@@ -464,7 +464,7 @@ end
 @inline function _compute_neighbors_1d!(neighbors, g::HypercubicLattice{1,T}, coord, count) where T
     x = coord[1]
     count = 0
-    
+
     # Left neighbor
     if x > 0
         count += 1
@@ -473,8 +473,8 @@ end
         count += 1
         neighbors[count] = Int32(g.sizes[1])  # Wrap to end
     end
-    
-    # Right neighbor  
+
+    # Right neighbor
     if x < g.sizes[1] - 1
         count += 1
         neighbors[count] = Int32(x + 2)  # coord_to_vertex((x+1,)) = x+1+1 = x+2
@@ -482,7 +482,7 @@ end
         count += 1
         neighbors[count] = Int32(1)  # Wrap to beginning
     end
-    
+
     return count
 end
 
@@ -491,7 +491,7 @@ end
     x, y = coord
     width, height = g.sizes
     count = 0
-    
+
     # Left neighbor (x-1, y)
     if x > 0
         count += 1
@@ -500,7 +500,7 @@ end
         count += 1
         neighbors[count] = Int32((width - 1) * height + y + 1)
     end
-    
+
     # Right neighbor (x+1, y)
     if x < width - 1
         count += 1
@@ -509,7 +509,7 @@ end
         count += 1
         neighbors[count] = Int32(y + 1)
     end
-    
+
     # Down neighbor (x, y-1)
     if y > 0
         count += 1
@@ -518,7 +518,7 @@ end
         count += 1
         neighbors[count] = Int32(x * height + (height - 1) + 1)
     end
-    
+
     # Up neighbor (x, y+1)
     if y < height - 1
         count += 1
@@ -527,7 +527,7 @@ end
         count += 1
         neighbors[count] = Int32(x * height + 1)
     end
-    
+
     return count
 end
 
@@ -536,10 +536,10 @@ end
     x, y, z = coord
     width, height, depth = g.sizes
     count = 0
-    
+
     # Helper for 3D coordinate to vertex conversion
     @inline coord_to_v(x, y, z) = Int32((x * height + y) * depth + z + 1)
-    
+
     # X-direction neighbors
     if x > 0
         count += 1
@@ -548,7 +548,7 @@ end
         count += 1
         neighbors[count] = coord_to_v(width - 1, y, z)
     end
-    
+
     if x < width - 1
         count += 1
         neighbors[count] = coord_to_v(x + 1, y, z)
@@ -556,7 +556,7 @@ end
         count += 1
         neighbors[count] = coord_to_v(0, y, z)
     end
-    
+
     # Y-direction neighbors
     if y > 0
         count += 1
@@ -565,7 +565,7 @@ end
         count += 1
         neighbors[count] = coord_to_v(x, height - 1, z)
     end
-    
+
     if y < height - 1
         count += 1
         neighbors[count] = coord_to_v(x, y + 1, z)
@@ -573,7 +573,7 @@ end
         count += 1
         neighbors[count] = coord_to_v(x, 0, z)
     end
-    
+
     # Z-direction neighbors
     if z > 0
         count += 1
@@ -582,7 +582,7 @@ end
         count += 1
         neighbors[count] = coord_to_v(x, y, depth - 1)
     end
-    
+
     if z < depth - 1
         count += 1
         neighbors[count] = coord_to_v(x, y, z + 1)
@@ -590,14 +590,14 @@ end
         count += 1
         neighbors[count] = coord_to_v(x, y, 0)
     end
-    
+
     return count
 end
 
 # General case for higher dimensions
 @inline function _compute_neighbors_nd!(neighbors, g::HypercubicLattice{D,T}, coord, count) where {D,T}
     count = 0
-    
+
     # For each dimension, check both directions
     @inbounds for dim in 1:D
         # Negative direction
@@ -610,7 +610,7 @@ end
             count += 1
             neighbors[count] = coord_to_vertex(g, new_coord)
         end
-        
+
         # Positive direction
         if coord[dim] < g.sizes[dim] - 1
             new_coord = ntuple(i -> i == dim ? coord[i] + 1 : coord[i], D)
@@ -622,7 +622,7 @@ end
             neighbors[count] = coord_to_vertex(g, new_coord)
         end
     end
-    
+
     return count
 end
 
@@ -638,7 +638,7 @@ Optimized for accessing specific neighbors in computational loops.
 """
 @inline function neighbor(g::HypercubicLattice{D,T}, v::Integer, k::Integer) where {D,T}
     coord = vertex_to_coord(g, v)
-    
+
     # Specialized implementations for common dimensions
     if D == 1
         return _neighbor_1d(g, coord, k)
@@ -658,7 +658,7 @@ end
 
 @inline function _neighbor_1d(g::HypercubicLattice{1,T}, coord, k) where T
     x = coord[1]
-    
+
     if k == 1
         # First neighbor: left direction
         if x > 0
@@ -685,7 +685,7 @@ end
 @inline function _neighbor_2d(g::HypercubicLattice{2,T}, coord, k) where T
     x, y = coord
     width, height = g.sizes
-    
+
     # Order: left, right, down, up (consistent with neighbor_indices)
     if k == 1  # Left
         if x > 0 || g.periodic[1]
@@ -708,16 +708,16 @@ end
             return Int32(x * height + ny + 1)
         end
     end
-    
+
     throw(BoundsError("Invalid neighbor index $k for vertex at coordinate $coord"))
 end
 
 @inline function _neighbor_3d(g::HypercubicLattice{3,T}, coord, k) where T
     x, y, z = coord
     width, height, depth = g.sizes
-    
+
     @inline coord_to_v(x, y, z) = Int32((x * height + y) * depth + z + 1)
-    
+
     # Order: -x, +x, -y, +y, -z, +z
     if k == 1  # -x
         if x > 0 || g.periodic[1]
@@ -750,7 +750,7 @@ end
             return coord_to_v(x, y, nz)
         end
     end
-    
+
     throw(BoundsError("Invalid neighbor index $k for vertex at coordinate $coord"))
 end
 
@@ -766,7 +766,7 @@ Compute degree without allocating neighbor list.
 @inline function degree(g::HypercubicLattice{D,T}, v::Integer) where {D,T}
     coord = vertex_to_coord(g, v)
     deg = 0
-    
+
     @inbounds for dim in 1:D
         # Check negative direction
         if coord[dim] > 0 || g.periodic[dim]
@@ -777,7 +777,7 @@ Compute degree without allocating neighbor list.
             deg += 1
         end
     end
-    
+
     return Int32(deg)
 end
 end # module Lattices

@@ -52,7 +52,7 @@ export add_vertex!, add_edge!, remove_vertex!, remove_edge!
 
 # Include core source files
 include("GraphInterface.jl")
-include("CoreGraph.jl") 
+include("CoreGraph.jl")
 include("AdjGraph.jl")
 include("PropertyGraph.jl")
 include("utils.jl")

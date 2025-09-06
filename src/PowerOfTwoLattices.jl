@@ -42,7 +42,7 @@ Uses bit operations for coordinate conversion and neighbor lookup.
 # 2D: 16×32 grid (2^4 × 2^5)
 g2d = P2Grid2D(4, 5)  # log₂ sizes
 
-# 3D: 8×8×16 cube (2^3 × 2^3 × 2^4)  
+# 3D: 8×8×16 cube (2^3 × 2^3 × 2^4)
 g3d = P2Grid3D(3, 3, 4)
 
 # 1D: 64-element chain (2^6)
@@ -55,23 +55,23 @@ struct PowerOfTwoLattice{D} <: GraphInterface
     masks::NTuple{D,Int32}        # Bit masks for each dimension
     total_vertices::Int32         # Total number of vertices
     total_edges::Int32           # Total number of edges
-    
+
     function PowerOfTwoLattice{D}(log_sizes::NTuple{D,Integer}) where D
         if D < 1 || D > 5
             throw(ArgumentError("Dimension must be 1 ≤ D ≤ 5, got $D"))
         end
-        
+
         if any(ls < 1 || ls > 20 for ls in log_sizes)  # Reasonable size limits
             throw(ArgumentError("Log sizes must be 1 ≤ log_size ≤ 20, got $log_sizes"))
         end
-        
+
         log_sizes_u8 = NTuple{D,UInt8}(log_sizes)
         sizes = ntuple(i -> Int32(1 << log_sizes[i]), D)
         masks = ntuple(i -> Int32((1 << log_sizes[i]) - 1), D)
-        
+
         total_vertices = Int32(prod(sizes))
         total_edges = Int32(D * total_vertices)  # Each vertex has 2 neighbors per dimension
-        
+
         new{D}(log_sizes_u8, sizes, masks, total_vertices, total_edges)
     end
 end
@@ -83,11 +83,11 @@ PowerOfTwoLattice(log_sizes::Vararg{Integer,D}) where D = PowerOfTwoLattice{D}(l
 """1D chain: size = 2^log_size"""
 P2Chain1D(log_size::Integer) = PowerOfTwoLattice{1}((log_size,))
 
-"""2D grid: sizes = 2^log_width × 2^log_height"""  
+"""2D grid: sizes = 2^log_width × 2^log_height"""
 P2Grid2D(log_width::Integer, log_height::Integer) = PowerOfTwoLattice{2}((log_width, log_height))
 
 """3D cube: sizes = 2^log_width × 2^log_height × 2^log_depth"""
-P2Grid3D(log_width::Integer, log_height::Integer, log_depth::Integer) = 
+P2Grid3D(log_width::Integer, log_height::Integer, log_depth::Integer) =
     PowerOfTwoLattice{3}((log_width, log_height, log_depth))
 
 # ==============================================================================
@@ -105,10 +105,10 @@ is_directed_graph(g::PowerOfTwoLattice) = false
     if !has_vertex(g, u) || !has_vertex(g, v)
         return false
     end
-    
+
     coord_u = vertex_to_coord(g, u)
     coord_v = vertex_to_coord(g, v)
-    
+
     # Check if they differ by ±1 in exactly one dimension (with wraparound)
     diff_count = 0
     for dim in 1:D
@@ -119,7 +119,7 @@ is_directed_graph(g::PowerOfTwoLattice) = false
             return false
         end
     end
-    
+
     return diff_count == 1
 end
 
@@ -130,7 +130,7 @@ end
 """Convert vertex to coordinates using bit operations."""
 @inline function vertex_to_coord(g::PowerOfTwoLattice{D}, v::Integer) where D
     idx = v - 1  # Convert to 0-based
-    
+
     if D == 1
         return (Int32(idx),)
     elseif D == 2
@@ -182,7 +182,7 @@ Each dimension contributes exactly 2 neighbors (periodic boundaries).
 """
 @inline function neighbor_indices(g::PowerOfTwoLattice{D}, v::Integer) where D
     coord = vertex_to_coord(g, v)
-    
+
     if D == 1
         return _neighbors_1d(g, coord)
     elseif D == 2
@@ -204,29 +204,29 @@ end
     return (left, right)
 end
 
-# 2D: exactly 4 neighbors  
+# 2D: exactly 4 neighbors
 @inline function _neighbors_2d(g::PowerOfTwoLattice{2}, coord)
     x, y = coord
-    
+
     # Use bit operations for wraparound
     left_x = (x - 1) & g.masks[1]
     right_x = (x + 1) & g.masks[1]
     down_y = (y - 1) & g.masks[2]
     up_y = (y + 1) & g.masks[2]
-    
+
     # Convert back to vertex indices using bit shifts
     left = (left_x << g.log_sizes[2]) | y + 1
     right = (right_x << g.log_sizes[2]) | y + 1
     down = (x << g.log_sizes[2]) | down_y + 1
     up = (x << g.log_sizes[2]) | up_y + 1
-    
+
     return (left, right, down, up)
 end
 
 # 3D: exactly 6 neighbors
 @inline function _neighbors_3d(g::PowerOfTwoLattice{3}, coord)
     x, y, z = coord
-    
+
     # Bit operations for all directions
     left_x = (x - 1) & g.masks[1]
     right_x = (x + 1) & g.masks[1]
@@ -234,18 +234,18 @@ end
     up_y = (y + 1) & g.masks[2]
     back_z = (z - 1) & g.masks[3]
     front_z = (z + 1) & g.masks[3]
-    
+
     # Convert to vertices
     base = (x << g.log_sizes[2]) | y
     current_slice = (base << g.log_sizes[3]) | z + 1
-    
+
     left = ((left_x << g.log_sizes[2]) | y) << g.log_sizes[3] | z + 1
     right = ((right_x << g.log_sizes[2]) | y) << g.log_sizes[3] | z + 1
     down = ((x << g.log_sizes[2]) | down_y) << g.log_sizes[3] | z + 1
     up = ((x << g.log_sizes[2]) | up_y) << g.log_sizes[3] | z + 1
     back = (base << g.log_sizes[3]) | back_z + 1
     front = (base << g.log_sizes[3]) | front_z + 1
-    
+
     return (left, right, down, up, back, front)
 end
 
@@ -254,19 +254,19 @@ end
     # Implementation for 4D case
     neighbors = Vector{Int32}(undef, 8)
     idx = 1
-    
+
     @inbounds for dim in 1:4
         # Negative direction
         new_coord = ntuple(i -> i == dim ? (coord[i] - 1) & g.masks[i] : coord[i], 4)
         neighbors[idx] = coord_to_vertex(g, new_coord)
         idx += 1
-        
-        # Positive direction  
+
+        # Positive direction
         new_coord = ntuple(i -> i == dim ? (coord[i] + 1) & g.masks[i] : coord[i], 4)
         neighbors[idx] = coord_to_vertex(g, new_coord)
         idx += 1
     end
-    
+
     return (neighbors[1], neighbors[2], neighbors[3], neighbors[4],
             neighbors[5], neighbors[6], neighbors[7], neighbors[8])
 end
@@ -276,19 +276,19 @@ end
     # Implementation for 5D case
     neighbors = Vector{Int32}(undef, 10)
     idx = 1
-    
+
     @inbounds for dim in 1:5
         # Negative direction
         new_coord = ntuple(i -> i == dim ? (coord[i] - 1) & g.masks[i] : coord[i], 5)
         neighbors[idx] = coord_to_vertex(g, new_coord)
         idx += 1
-        
+
         # Positive direction
         new_coord = ntuple(i -> i == dim ? (coord[i] + 1) & g.masks[i] : coord[i], 5)
         neighbors[idx] = coord_to_vertex(g, new_coord)
         idx += 1
     end
-    
+
     return (neighbors[1], neighbors[2], neighbors[3], neighbors[4],
             neighbors[5], neighbors[6], neighbors[7], neighbors[8],
             neighbors[9], neighbors[10])
@@ -306,17 +306,17 @@ Order: dim1-, dim1+, dim2-, dim2+, ...
     if k < 1 || k > 2*D
         throw(BoundsError("Neighbor index $k out of bounds (vertices have $(2*D) neighbors)"))
     end
-    
+
     coord = vertex_to_coord(g, v)
     dim = (k + 1) ÷ 2  # Which dimension
     direction = k % 2  # 1 = negative, 0 = positive
-    
+
     if direction == 1  # Negative direction
         new_coord = ntuple(i -> i == dim ? (coord[i] - 1) & g.masks[i] : coord[i], D)
     else  # Positive direction
         new_coord = ntuple(i -> i == dim ? (coord[i] + 1) & g.masks[i] : coord[i], D)
     end
-    
+
     return coord_to_vertex(g, new_coord)
 end
 
@@ -334,7 +334,7 @@ For power-of-2 lattices, edges are ordered by dimension: dim1-, dim1+, dim2-, di
     if i < 1 || i > 2*D
         throw(BoundsError("Edge index $i out of bounds (vertex $v has $(2*D) edges)"))
     end
-    
+
     # Simple formula: each vertex contributes 2*D edges, ordered by local edge index
     return Int32((v - 1) * (2*D) + i)
 end
@@ -347,7 +347,7 @@ Returns edges in order: dim1-, dim1+, dim2-, dim2+, dim3-, dim3+, ...
 """
 @inline function edge_indices(g::PowerOfTwoLattice{D}, v::Integer) where D
     base = Int32((v - 1) * (2*D))
-    
+
     if D == 1
         return (base + 1, base + 2)
     elseif D == 2
@@ -373,7 +373,7 @@ end
 Get the i-th directed edge index from vertex v.
 For undirected lattices, this is the same as edge_index.
 """
-@inline directed_edge_index(g::PowerOfTwoLattice{D}, v::Integer, i::Integer) where D = 
+@inline directed_edge_index(g::PowerOfTwoLattice{D}, v::Integer, i::Integer) where D =
     edge_index(g, v, i)
 
 """
@@ -382,7 +382,7 @@ For undirected lattices, this is the same as edge_index.
 Get all directed edge indices from vertex v.
 For undirected lattices, this is the same as edge_indices.
 """
-@inline directed_edge_indices(g::PowerOfTwoLattice{D}, v::Integer) where D = 
+@inline directed_edge_indices(g::PowerOfTwoLattice{D}, v::Integer) where D =
     edge_indices(g, v)
 
 # ==============================================================================
@@ -399,17 +399,17 @@ Uses the smaller vertex as the base and computes which local edge it is.
     if !has_edge(g, u, v)
         return Int32(0)
     end
-    
+
     # Use smaller vertex as base for consistent edge indexing
     min_vertex, max_vertex = minmax(u, v)
-    
+
     # Find which local edge this is from min_vertex
     coord_min = vertex_to_coord(g, min_vertex)
     coord_max = vertex_to_coord(g, max_vertex)
-    
+
     # Find the dimension and direction
     local_edge_idx = _find_local_edge_index(g, coord_min, coord_max)
-    
+
     return edge_index(g, min_vertex, local_edge_idx)
 end
 
@@ -427,7 +427,7 @@ Helper function to find which local edge connects two adjacent coordinates.
             return 2*dim - 1  # Negative direction edge
         end
     end
-    
+
     # Should never reach here for valid adjacent vertices
     throw(ArgumentError("Vertices are not adjacent"))
 end
@@ -446,14 +446,14 @@ Returns (smaller_vertex, larger_vertex) for consistency.
     if edge_idx < 1 || edge_idx > num_edges(g)
         throw(BoundsError("Edge index $edge_idx out of bounds"))
     end
-    
+
     # Decode which vertex and local edge
     vertex_offset = (edge_idx - 1) ÷ (2*D)
     local_edge = (edge_idx - 1) % (2*D) + 1
-    
+
     base_vertex = Int32(vertex_offset + 1)
     neighbor_vertex = neighbor(g, base_vertex, local_edge)
-    
+
     return minmax(base_vertex, neighbor_vertex)
 end
 
@@ -471,10 +471,10 @@ Returns (dimension, direction) where direction is :negative or :positive.
     if local_edge < 1 || local_edge > 2*D
         throw(BoundsError("Local edge index $local_edge out of bounds"))
     end
-    
+
     dim = (local_edge + 1) ÷ 2
     direction = local_edge % 2 == 1 ? :negative : :positive
-    
+
     return (dim, direction)
 end
 
@@ -487,7 +487,7 @@ Convert dimension and direction to local edge index.
     if dim < 1 || dim > D
         throw(BoundsError("Dimension $dim out of bounds"))
     end
-    
+
     if direction == :negative
         return Int32(2*dim - 1)
     elseif direction == :positive

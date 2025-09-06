@@ -26,7 +26,7 @@ This module defines a minimal, extensible interface for graph types that provide
 The interface separates **structure** (connectivity) from **data** (weights, properties),
 allowing users to choose the optimal storage strategy for their use case:
 
-- **Structure**: Handled by CoreGraph (CSR) or AdjGraph (adjacency lists)  
+- **Structure**: Handled by CoreGraph (CSR) or AdjGraph (adjacency lists)
 - **Weights**: Optional typed weights with directional support
 - **Properties**: Optional typed vertex/edge properties
 - **External Data**: User-managed arrays with stable index mapping
@@ -40,7 +40,7 @@ GraphCore provides two complementary edge indexing schemes:
 edge_capacities = Vector{Float64}(undef, num_edges(g))
 edge_idx = find_edge_index(g, u, v)  # Same for (u,v) and (v,u)
 
-# Directed edge indices (1:num_directed_edges) - for directional properties  
+# Directed edge indices (1:num_directed_edges) - for directional properties
 edge_flows = Vector{Float64}(undef, num_directed_edges(g))
 flow_uv = find_directed_edge_index(g, u, v)  # Different from (v,u)
 ```
@@ -126,12 +126,12 @@ function has_edge end
 
 Return an iterator over the neighbor indices of vertex v.
 
-**For directed graphs**: Returns out-neighbors only  
+**For directed graphs**: Returns out-neighbors only
 **For undirected graphs**: Returns all neighbors
 
 **Performance guarantee**: The returned iterator must support:
 - Fast iteration: `for neighbor in neighbor_indices(g, v)`
-- Length query: `length(neighbor_indices(g, v))` 
+- Length query: `length(neighbor_indices(g, v))`
 - Index access: `neighbor_indices(g, v)[i]` (implementation dependent)
 
 **Memory efficiency**: Implementations should return views when possible
@@ -571,7 +571,7 @@ all_edges(g::GraphInterface) = edges(g)
     all_directed_edges(g::GraphInterface) -> Iterator
 
 Return an iterator over all directed edges in the graph.
-- For directed graphs: yields (source, target) pairs for each directed edge  
+- For directed graphs: yields (source, target) pairs for each directed edge
 - For undirected graphs: yields (u, v) and (v, u) pairs for each undirected edge
 
 # Examples
@@ -594,7 +594,7 @@ Unified iterator over edges in a graph, yielding (source, target) tuples.
 # Type Parameters
 - `G<:GraphInterface`: The graph type
 - `D::Bool`: Direction mode
-  - `D=false` (undirected mode): For directed graphs yields each edge once as (u,v). 
+  - `D=false` (undirected mode): For directed graphs yields each edge once as (u,v).
                                 For undirected graphs yields each edge once in canonical form (u,v) where u ≤ v.
   - `D=true` (directed mode): For directed graphs yields each edge once as (u,v).
                               For undirected graphs yields each edge twice as (u,v) and (v,u).
@@ -603,29 +603,29 @@ See also: [`edges`](@ref), [`all_directed_edges`](@ref)
 """
 struct EdgeIterator{G<:GraphInterface,D}
     graph::G
-    
+
     EdgeIterator{G,D}(graph::G) where {G<:GraphInterface,D} = new{G,D}(graph)
     EdgeIterator(graph::G, D::Bool) where {G<:GraphInterface} = new{G,D}(graph)
 end
 
 function Base.iterate(iter::EdgeIterator{G,D}, state=nothing) where {G,D}
     g = iter.graph
-    
+
     if state === nothing
         # Initialize: start with vertex 1, neighbor index 0
         state = (Int32(1), Int32(0))
     end
-    
+
     vertex, neighbor_idx = state
-    
+
     # Find next edge
     while vertex <= num_vertices(g)
         neighbors = @inbounds neighbor_indices(g, vertex)
         neighbor_idx += Int32(1)
-        
+
         if neighbor_idx <= length(neighbors)
             @inbounds target = neighbors[neighbor_idx]  # Safe bounds check above
-            
+
             if D  # Directed mode: yield all directed edges
                 return (vertex, target), (vertex, neighbor_idx)
             else  # Undirected mode: yield canonical edges only
@@ -642,7 +642,7 @@ function Base.iterate(iter::EdgeIterator{G,D}, state=nothing) where {G,D}
             neighbor_idx = Int32(0)
         end
     end
-    
+
     return nothing  # No more edges
 end
 
@@ -656,26 +656,26 @@ Base.eltype(::EdgeIterator) = Tuple{Int, Int}
 function Base.show(io::IO, iter::EdgeIterator{G,D}) where {G,D}
     g = iter.graph
     n_edges = length(iter)
-    
+
     # Determine iterator type and description
     if D
         iter_type = n_edges == 1 ? "directed edge" : "directed edges"
     else
         iter_type = n_edges == 1 ? "edge" : "edges"
     end
-    
+
     # Graph type name (without parameters for cleaner display)
     graph_type = string(nameof(typeof(g)))
     direction_str = is_directed_graph(g) ? "directed" : "undirected"
-    
+
     print(io, "EdgeIterator over $n_edges $iter_type from $graph_type ($direction_str)")
-    
+
     # Show a preview of edges if the graph has any
     if n_edges > 0
         # Get first few edges for preview (limit to avoid performance issues)
         preview_count = min(n_edges, 3)
         preview_edges = collect(Iterators.take(iter, preview_count))
-        
+
         edge_strs = ["($u, $v)" for (u,v) in preview_edges]
         if n_edges <= preview_count
             print(io, ": ", join(edge_strs, ", "))
@@ -738,7 +738,7 @@ end
 
 """
     Graphs.inneighbors(g::GraphInterface, v::Integer) -> Vector{Int}
-    
+
 Return vertices that have outgoing edges to vertex v.
 
 ⚠️  **Performance Warning**: For directed graphs, this is O(V) operation.
@@ -752,7 +752,7 @@ Return vertices that have outgoing edges to vertex v.
         # Optimized: use sizehint and avoid intermediate collections
         result = Int32[]
         sizehint!(result, 8)  # Reasonable guess for initial capacity
-        
+
         for u in vertices(g)
             # Use view to avoid allocation, then use optimized search
             neighbors = @inbounds neighbor_indices(g, u)
@@ -791,7 +791,7 @@ Validate that a graph type correctly implements the GraphInterface.
 Performs comprehensive checks including:
 - Method availability for the graph type
 - Basic functionality (if graph is non-empty)
-- Index range consistency  
+- Index range consistency
 - Directed vs undirected edge count relationships
 - Iterator and view consistency
 
@@ -812,7 +812,7 @@ function validate_interface(g::GraphInterface)
         (neighbor_indices, (typeof(g), Int)),
         (is_directed_graph, (typeof(g),))
     ]
-    
+
     for (method, signature) in required_methods
         if !hasmethod(method, signature)
             error("Graph type $(typeof(g)) must implement $method$signature")
@@ -822,23 +822,23 @@ function validate_interface(g::GraphInterface)
     # Test basic functionality if graph is non-empty
     if num_vertices(g) > 0
         v1 = first(vertices(g))
-        
+
         # Test neighbor iteration
         neighbors = neighbor_indices(g, v1)
         # @assert neighbors isa AbstractNeighborIterator
         @assert length(neighbors) >= 0
-        
+
         # Test index ranges
         @assert edge_indices(g) == 1:num_edges(g)
         @assert directed_edge_indices(g) == 1:num_directed_edges(g)
-        
+
         # Test consistency
         @assert num_directed_edges(g) >= num_edges(g)
         if !is_directed_graph(g)
             @assert num_directed_edges(g) == 2 * num_edges(g)
         end
     end
-    
+
     println("Interface validation passed for $(typeof(g))")
 end
 
@@ -851,7 +851,7 @@ function interface_summary()
     println("""
     GraphInterface Interface Summary:
     =======================================
-    
+
     REQUIRED METHODS (Core Interface):
     - num_vertices(g) -> Int32
     - num_edges(g) -> Int32
@@ -871,7 +871,7 @@ function interface_summary()
 
     WEIGHTED GRAPH INTERFACE:
     - edge_weights(g, v) -> view or iterator
-    - edge_weights(g) -> view or iterator  
+    - edge_weights(g) -> view or iterator
     - edge_weight(g, directed_edge_idx) -> W
     - neighbor_weights(g, v) -> iterator
 
@@ -893,7 +893,7 @@ function interface_summary()
     - edge_indices(g) -> UnitRange{Int}
     - directed_edge_indices(g) -> UnitRange{Int}
     - edges(g) -> EdgeIterator{G,false}
-    - all_edges(g) -> EdgeIterator{G,false}  
+    - all_edges(g) -> EdgeIterator{G,false}
     - all_directed_edges(g) -> EdgeIterator{G,true}
     - neighbor(g, v, i) -> Int32
 
@@ -923,34 +923,34 @@ Edge Index Stability Guarantees:
    - Used for shared edge properties (e.g., edge labels, capacities)
    - For undirected graphs: find_edge_index(g, u, v) == find_edge_index(g, v, u)
 
-2. DIRECTED EDGE INDICES (1:num_directed_edges):  
+2. DIRECTED EDGE INDICES (1:num_directed_edges):
    - Remain stable when adding vertices or edges
    - May be invalidated when removing edges or vertices
    - Used for directional edge properties (e.g., flows, costs)
    - Always directional: find_directed_edge_index(g, u, v) ≠ find_directed_edge_index(g, v, u)
 
 3. EXTERNAL ARRAY USAGE PATTERNS:
-   
+
    # Undirected edge properties (shared between directions)
    edge_labels = Vector{String}(undef, num_edges(g))
    edge_capacities = Vector{Float64}(undef, num_edges(g))
-   
-   # Directional edge properties  
+
+   # Directional edge properties
    edge_flows = Vector{Float64}(undef, num_directed_edges(g))
    edge_costs = Vector{Float64}(undef, num_directed_edges(g))
-   
+
    # Usage:
    for (u, v) in edges(g)
        edge_idx = find_edge_index(g, u, v)
        label = edge_labels[edge_idx]
        capacity = edge_capacities[edge_idx]
-       
+
        fwd_idx = find_directed_edge_index(g, u, v)
        flow_uv = edge_flows[fwd_idx]
        cost_uv = edge_costs[fwd_idx]
-       
+
        if !is_directed_graph(g)
-           rev_idx = find_directed_edge_index(g, v, u)  
+           rev_idx = find_directed_edge_index(g, v, u)
            flow_vu = edge_flows[rev_idx]
            cost_vu = edge_costs[rev_idx]
        end
