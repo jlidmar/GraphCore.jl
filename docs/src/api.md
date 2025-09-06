@@ -5,6 +5,7 @@
 ```@autodocs
 Modules = [GraphCore]
 Order   = [:type, :function]
+Private = false
 ```
 
 ## Graph Construction
@@ -12,6 +13,7 @@ Order   = [:type, :function]
 ```@autodocs
 Modules = [GraphCore.GraphConstruction]
 Order   = [:type, :function]
+Private = false
 ```
 
 ## Conversions
@@ -19,6 +21,7 @@ Order   = [:type, :function]
 ```@autodocs
 Modules = [GraphCore.Conversions]
 Order   = [:type, :function]
+Private = false
 ```
 
 ## Lattices
@@ -26,4 +29,5 @@ Order   = [:type, :function]
 ```@autodocs
 Modules = [GraphCore.Lattices, GraphCore.PowerOfTwoLattices]
 Order   = [:type, :function]
+Private = false
 ```
