@@ -1,275 +1,172 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · GraphCore.jl</title><meta name="title" content="Home · GraphCore.jl"/><meta property="og:title" content="Home · GraphCore.jl"/><meta property="twitter:title" content="Home · GraphCore.jl"/><meta name="description" content="Documentation for GraphCore.jl."/><meta property="og:description" content="Documentation for GraphCore.jl."/><meta property="twitter:description" content="Documentation for GraphCore.jl."/><meta property="og:url" content="https://jlidmar.github.io/GraphCore.jl/"/><meta property="twitter:url" content="https://jlidmar.github.io/GraphCore.jl/"/><link rel="canonical" href="https://jlidmar.github.io/GraphCore.jl/"/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href>GraphCore.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a><ul class="internal"><li><a class="tocitem" href="#Design-Philosophy"><span>Design Philosophy</span></a></li><li><a class="tocitem" href="#Architecture-Overview"><span>Architecture Overview</span></a></li><li><a class="tocitem" href="#Core-Types-and-Submodules"><span>Core Types and Submodules</span></a></li><li><a class="tocitem" href="#Core-Graph-Types"><span>Core Graph Types</span></a></li><li><a class="tocitem" href="#Key-Features"><span>Key Features</span></a></li><li><a class="tocitem" href="#Usage-Examples"><span>Usage Examples</span></a></li><li><a class="tocitem" href="#Performance-Best-Practices"><span>Performance Best Practices</span></a></li><li><a class="tocitem" href="#Performance-Characteristics"><span>Performance Characteristics</span></a></li><li><a class="tocitem" href="#Graphs.jl-Compatibility"><span>Graphs.jl Compatibility</span></a></li><li><a class="tocitem" href="#Design-Decisions-and-Trade-offs"><span>Design Decisions &amp; Trade-offs</span></a></li></ul></li><li><a class="tocitem" href="api/">API Reference</a></li><li><a class="tocitem" href="docindex/">Index</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/jlidmar/GraphCore.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/jlidmar/GraphCore.jl/blob/main/docs/src/index.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="GraphCore.jl"><a class="docs-heading-anchor" href="#GraphCore.jl">GraphCore.jl</a><a id="GraphCore.jl-1"></a><a class="docs-heading-anchor-permalink" href="#GraphCore.jl" title="Permalink"></a></h1><p>A high-performance, type-safe graph library for Julia with a focus on efficiency, flexibility, and ease of use.</p><h2 id="Design-Philosophy"><a class="docs-heading-anchor" href="#Design-Philosophy">Design Philosophy</a><a id="Design-Philosophy-1"></a><a class="docs-heading-anchor-permalink" href="#Design-Philosophy" title="Permalink"></a></h2><p>GraphCore.jl is designed around three key principles:</p><h3 id="**Performance-Oriented-Design**"><a class="docs-heading-anchor" href="#**Performance-Oriented-Design**"><strong>Performance-Oriented Design</strong></a><a id="**Performance-Oriented-Design**-1"></a><a class="docs-heading-anchor-permalink" href="#**Performance-Oriented-Design**" title="Permalink"></a></h3><ul><li><strong>CSR Storage</strong>: Compressed Sparse Row format for cache-efficient traversal</li><li><strong>Type Specialization</strong>: Parametric types enable compiler optimizations and zero-cost abstractions</li><li><strong>Efficient Indexing</strong>: Direct O(1) access patterns with <code>Int32</code> indexing for memory efficiency</li><li><strong>Minimal Overhead</strong>: Compact memory layouts optimized for common graph operations</li></ul><h3 id="**Flexible-Storage-Options**"><a class="docs-heading-anchor" href="#**Flexible-Storage-Options**"><strong>Flexible Storage Options</strong></a><a id="**Flexible-Storage-Options**-1"></a><a class="docs-heading-anchor-permalink" href="#**Flexible-Storage-Options**" title="Permalink"></a></h3><ul><li><strong>Multiple Representations</strong>: CSR format (CoreGraph) for static analysis, adjacency lists (AdjGraph) for dynamic operations</li><li><strong>Unified Interface</strong>: All graph types implement the same <code>GraphInterface</code> for consistent usage</li><li><strong>Property Integration</strong>: Built-in support for type-safe vertex and edge properties</li><li><strong>External Array Support</strong>: Stable indexing schemes for user-managed data arrays</li></ul><h3 id="**Type-Safety-and-Reliability**"><a class="docs-heading-anchor" href="#**Type-Safety-and-Reliability**"><strong>Type Safety and Reliability</strong></a><a id="**Type-Safety-and-Reliability**-1"></a><a class="docs-heading-anchor-permalink" href="#**Type-Safety-and-Reliability**" title="Permalink"></a></h3><ul><li><strong>Compile-Time Checking</strong>: Parametric types catch common errors during compilation</li><li><strong>Clear Data Ownership</strong>: Explicit separation between graph structure, weights, and properties  </li><li><strong>Stable Indexing</strong>: Consistent edge/vertex indices for reliable external array management</li><li><strong>Comprehensive Validation</strong>: Input checking and well-defined method contracts</li></ul><h2 id="Architecture-Overview"><a class="docs-heading-anchor" href="#Architecture-Overview">Architecture Overview</a><a id="Architecture-Overview-1"></a><a class="docs-heading-anchor-permalink" href="#Architecture-Overview" title="Permalink"></a></h2><pre><code class="nohighlight hljs">GraphCore.jl
-├── GraphInterface      # Abstract interface definition
-├── CoreGraph           # CSR-based graphs (static, high-performance)
-├── AdjGraph            # Adjacency list graphs (dynamic, mutable)
-└── GraphConstruction   # Builder patterns for graph construction</code></pre><h2 id="Core-Types-and-Submodules"><a class="docs-heading-anchor" href="#Core-Types-and-Submodules">Core Types and Submodules</a><a id="Core-Types-and-Submodules-1"></a><a class="docs-heading-anchor-permalink" href="#Core-Types-and-Submodules" title="Permalink"></a></h2><h3 id="**Main-Module:-GraphCore**"><a class="docs-heading-anchor" href="#**Main-Module:-GraphCore**"><strong>Main Module: GraphCore</strong></a><a id="**Main-Module:-GraphCore**-1"></a><a class="docs-heading-anchor-permalink" href="#**Main-Module:-GraphCore**" title="Permalink"></a></h3><pre><code class="language-julia hljs">using GraphCore
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Home · GraphCore.jl</title><meta name="title" content="Home · GraphCore.jl"/><meta property="og:title" content="Home · GraphCore.jl"/><meta property="twitter:title" content="Home · GraphCore.jl"/><meta name="description" content="Documentation for GraphCore.jl."/><meta property="og:description" content="Documentation for GraphCore.jl."/><meta property="twitter:description" content="Documentation for GraphCore.jl."/><meta property="og:url" content="https://jlidmar.github.io/GraphCore.jl/"/><meta property="twitter:url" content="https://jlidmar.github.io/GraphCore.jl/"/><link rel="canonical" href="https://jlidmar.github.io/GraphCore.jl/"/><script data-outdated-warner src="assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="search_index.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href>GraphCore.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Home</a><ul class="internal"><li><a class="tocitem" href="#Quick-Start"><span>Quick Start</span></a></li><li><a class="tocitem" href="#Installation"><span>Installation</span></a></li><li><a class="tocitem" href="#Graph-Types-Overview"><span>Graph Types Overview</span></a></li><li><a class="tocitem" href="#Common-Workflows"><span>Common Workflows</span></a></li><li><a class="tocitem" href="#Working-with-Properties"><span>Working with Properties</span></a></li><li><a class="tocitem" href="#Integration-with-Graphs.jl"><span>Integration with Graphs.jl</span></a></li><li><a class="tocitem" href="#Safety-and-Performance"><span>Safety and Performance</span></a></li><li><a class="tocitem" href="#Next-Steps"><span>Next Steps</span></a></li><li><a class="tocitem" href="#Need-Help?"><span>Need Help?</span></a></li></ul></li><li><a class="tocitem" href="design/">Design Philosophy</a></li><li><a class="tocitem" href="api/">API Reference</a></li><li><a class="tocitem" href="docindex/">Index</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Home</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Home</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/jlidmar/GraphCore.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/jlidmar/GraphCore.jl/blob/main/docs/src/index.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="GraphCore.jl-User-Guide"><a class="docs-heading-anchor" href="#GraphCore.jl-User-Guide">GraphCore.jl User Guide</a><a id="GraphCore.jl-User-Guide-1"></a><a class="docs-heading-anchor-permalink" href="#GraphCore.jl-User-Guide" title="Permalink"></a></h1><p>A high-performance, type-safe graph library for Julia with a focus on efficiency, flexibility, and ease of use.</p><p>GraphCore.jl provides multiple specialized graph data structures optimized for different use cases - from static analysis with CoreGraph&#39;s compressed storage to dynamic construction with AdjGraph&#39;s adjacency lists. All graph types support efficient mutations, type-safe properties, and seamless integration with the Graphs.jl ecosystem, allowing you to use existing algorithms while benefiting from GraphCore&#39;s performance optimizations.</p><h2 id="Quick-Start"><a class="docs-heading-anchor" href="#Quick-Start">Quick Start</a><a id="Quick-Start-1"></a><a class="docs-heading-anchor-permalink" href="#Quick-Start" title="Permalink"></a></h2><pre><code class="language-julia hljs">using GraphCore
 
-# Core functionality (always available)
-edge_list = [(1,2), (2,3), (3,1)]
-weights = [0.5, 1.1, 0.2]
-vertex_props = [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;]
-edge_props = [1,2,3]
-g = build_core_graph(edge_list; directed=true)
-wg = build_weighted_graph(edge_list, weights; directed=false)
-pg = build_property_graph(edge_list, vertex_props, edge_props; directed=true)</code></pre><h3 id="**Available-Submodules**"><a class="docs-heading-anchor" href="#**Available-Submodules**"><strong>Available Submodules</strong></a><a id="**Available-Submodules**-1"></a><a class="docs-heading-anchor-permalink" href="#**Available-Submodules**" title="Permalink"></a></h3><pre><code class="language-julia hljs">using GraphCore.Conversions        # ✅ Type conversions and Graphs.jl interop
-using GraphCore.GraphConstruction  # ✅ Advanced construction patterns  
-using GraphCore.Lattices           # ✅ Special graph structures
-using GraphCore.PowerOfTwoLattices # ✅ Optimized power-of-two lattices
+# Create your first graph
+edges = [(1,2), (2,3), (1,3)]
+g = build_core_graph(edges; directed=false)
 
-# Conversion utilities (e.g.- to and from Graphs.jl types)
-graphs_g = from_graphs_jl(simple_graph)
-our_graph = to_graphs_jl(core_graph)
+# Query the graph
+println(&quot;Graph has $(num_vertices(g)) vertices and $(num_edges(g)) edges&quot;)
+println(&quot;Neighbors of vertex 1: $(collect(neighbor_indices(g, 1)))&quot;)</code></pre><h2 id="Installation"><a class="docs-heading-anchor" href="#Installation">Installation</a><a id="Installation-1"></a><a class="docs-heading-anchor-permalink" href="#Installation" title="Permalink"></a></h2><pre><code class="language-julia hljs">using Pkg
+Pkg.add(&quot;GraphCore&quot;)</code></pre><p>For optional features:</p><pre><code class="language-julia hljs"># For benchmarking examples
+Pkg.add(&quot;BenchmarkTools&quot;)
 
-# Graph construction helpers  
-builder = WeightedGraphBuilder(Float64; directed=false)
-add_edge!(builder, 1, 2, weight=0.9)
-graph = build_graph(builder)
+# For plotting examples  
+Pkg.add([&quot;Plots&quot;, &quot;GraphRecipes&quot;])</code></pre><h2 id="Graph-Types-Overview"><a class="docs-heading-anchor" href="#Graph-Types-Overview">Graph Types Overview</a><a id="Graph-Types-Overview-1"></a><a class="docs-heading-anchor-permalink" href="#Graph-Types-Overview" title="Permalink"></a></h2><p>GraphCore provides four main graph types, each optimized for different use cases:</p><h3 id="**CoreGraph**-High-Performance-Static-Analysis"><a class="docs-heading-anchor" href="#**CoreGraph**-High-Performance-Static-Analysis"><strong>CoreGraph</strong> - High-Performance Static Analysis</a><a id="**CoreGraph**-High-Performance-Static-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#**CoreGraph**-High-Performance-Static-Analysis" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Best for: Fast queries, analysis algorithms, memory efficiency
+g = build_core_graph([(1,2), (2,3), (1,3)]; directed=false)
 
-# Special graph structures
-lattice_3d = HypercubicLattice{3,Int}((5, 5, 5))
-lattice_2d = PowerOfTwoLattice(4,5) # size 2^4 x 2^5 = 16 x 32</code></pre><h2 id="Core-Graph-Types"><a class="docs-heading-anchor" href="#Core-Graph-Types">Core Graph Types</a><a id="Core-Graph-Types-1"></a><a class="docs-heading-anchor-permalink" href="#Core-Graph-Types" title="Permalink"></a></h2><h3 id="**CoreGraph{D}**-High-Performance-Static-Graphs"><a class="docs-heading-anchor" href="#**CoreGraph{D}**-High-Performance-Static-Graphs"><strong>CoreGraph{D}</strong> - High-Performance Static Graphs</a><a id="**CoreGraph{D}**-High-Performance-Static-Graphs-1"></a><a class="docs-heading-anchor-permalink" href="#**CoreGraph{D}**-High-Performance-Static-Graphs" title="Permalink"></a></h3><pre><code class="language-julia hljs"># CSR (Compressed Sparse Row) storage with efficient mutations
-g = build_graph(CoreGraph, edge_list; directed=true)
-add_edge!(g, u, v)          # ✅ Efficient in-place mutations
-remove_vertex!(g, v)        # ✅ Dynamic modifications  
-# ✅ O(1) neighbor access
-# ✅ Cache-efficient iteration  
-# ✅ Minimal memory overhead
-# ✅ Supports efficient mutations</code></pre><h3 id="**WeightedGraph{W,D}**-Weighted-Static-Graphs"><a class="docs-heading-anchor" href="#**WeightedGraph{W,D}**-Weighted-Static-Graphs"><strong>WeightedGraph{W,D}</strong> - Weighted Static Graphs</a><a id="**WeightedGraph{W,D}**-Weighted-Static-Graphs-1"></a><a class="docs-heading-anchor-permalink" href="#**WeightedGraph{W,D}**-Weighted-Static-Graphs" title="Permalink"></a></h3><pre><code class="language-julia hljs"># CSR with parallel weight arrays, with mutation support
-g = build_graph(WeightedGraph{Float64}, edge_list; weights=weights, directed=true)
-add_edge!(g, u, v, weight)  # ✅ Add weighted edges efficiently
-# ✅ Type-safe weights (W can be any numeric type)
-# ✅ Directional weights even for undirected graphs
-# ✅ Same performance as CoreGraph
-# ✅ Supports efficient mutations</code></pre><h3 id="**PropertyGraph{G,V,E}**-Graphs-with-Properties"><a class="docs-heading-anchor" href="#**PropertyGraph{G,V,E}**-Graphs-with-Properties"><strong>PropertyGraph{G,V,E}</strong> - Graphs with Properties</a><a id="**PropertyGraph{G,V,E}**-Graphs-with-Properties-1"></a><a class="docs-heading-anchor-permalink" href="#**PropertyGraph{G,V,E}**-Graphs-with-Properties" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Wrapper around any base graph type
-g = PropertyGraph(core_graph, vertex_props, edge_props)
-# ✅ Type-safe properties
-# ✅ Zero overhead delegation
-# ✅ Works with any underlying graph type
-# ⚠️  Mutation performance depends on underlying type</code></pre><h3 id="**AdjGraph{D}**-Dynamic-Mutable-Graphs"><a class="docs-heading-anchor" href="#**AdjGraph{D}**-Dynamic-Mutable-Graphs"><strong>AdjGraph{D}</strong> - Dynamic Mutable Graphs</a><a id="**AdjGraph{D}**-Dynamic-Mutable-Graphs-1"></a><a class="docs-heading-anchor-permalink" href="#**AdjGraph{D}**-Dynamic-Mutable-Graphs" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Vector{Vector{Int32}} storage
-g = build_adj_graph(edge_list; directed=true)
-add_edge!(g, u, v)      # ✅ O(1) mutations
-remove_vertex!(g, v)    # ✅ Dynamic modification
-# ✅ Efficient for construction and modification
-# ❌ Higher memory overhead than CSR</code></pre><h2 id="Key-Features"><a class="docs-heading-anchor" href="#Key-Features">Key Features</a><a id="Key-Features-1"></a><a class="docs-heading-anchor-permalink" href="#Key-Features" title="Permalink"></a></h2><h3 id="**Safety-First-Performance**"><a class="docs-heading-anchor" href="#**Safety-First-Performance**"><strong>Safety-First Performance</strong></a><a id="**Safety-First-Performance**-1"></a><a class="docs-heading-anchor-permalink" href="#**Safety-First-Performance**" title="Permalink"></a></h3><p>GraphCore implements Julia-idiomatic bounds checking for all vertex and edge access:</p><pre><code class="language-julia hljs">g = build_core_graph([(1,2), (2,3), (1,3)]; directed=false)
-
-# Safe by default - throws BoundsError for invalid vertices
-neighbor_indices(g, 10)      # BoundsError: vertex 10 out of bounds [1,3]
-has_edge(g, 1, 10)          # BoundsError: vertex 10 out of bounds [1,3]
-find_directed_edge_index(g, 10, 1)  # BoundsError: vertex 10 out of bounds [1,3]
-
-# Optimizable for performance-critical code
-function hot_path_algorithm(g, vertices)
-    for v in vertices
-        # @inbounds disables bounds checking when you know access is safe
-        neighbors = @inbounds neighbor_indices(g, v)
-        edge_idx = @inbounds find_directed_edge_index(g, v, first(neighbors))
-        # ... fast inner loop operations
-    end
+# Lightning-fast neighbor access
+for neighbor in neighbor_indices(g, 1)
+    println(&quot;Neighbor: $neighbor&quot;)
 end
 
-# Global bounds checking control
-# --check-bounds=no    # Disable all bounds checking (unsafe but maximum speed)
-# --check-bounds=yes   # Enable all bounds checking (safe, default)</code></pre><p><strong>Safety guarantees:</strong></p><ul><li>✅ All vertex/edge access is bounds-checked by default</li><li>✅ Invalid access throws descriptive <code>BoundsError</code> exceptions</li><li>✅ <code>@inbounds</code> provides escape hatch for performance-critical sections</li><li>✅ No performance penalty when bounds checking is disabled globally</li></ul><h3 id="**Dual-Indexing-System**"><a class="docs-heading-anchor" href="#**Dual-Indexing-System**"><strong>Dual Indexing System</strong></a><a id="**Dual-Indexing-System**-1"></a><a class="docs-heading-anchor-permalink" href="#**Dual-Indexing-System**" title="Permalink"></a></h3><p>GraphCore provides two complementary indexing schemes for maximum flexibility:</p><pre><code class="language-julia hljs"># Undirected edge indices (1:num_edges)
-edge_capacities = Vector{Float64}(undef, num_edges(g))
-edge_idx = find_edge_index(g, u, v)  # Same result for (u,v) and (v,u)
+# Efficient mutations
+add_edge!(g, 1, 4)
+add_vertex!(g)</code></pre><h3 id="**WeightedGraph**-Graphs-with-Edge-Weights"><a class="docs-heading-anchor" href="#**WeightedGraph**-Graphs-with-Edge-Weights"><strong>WeightedGraph</strong> - Graphs with Edge Weights</a><a id="**WeightedGraph**-Graphs-with-Edge-Weights-1"></a><a class="docs-heading-anchor-permalink" href="#**WeightedGraph**-Graphs-with-Edge-Weights" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Best for: Algorithms needing edge weights (shortest paths, MST, etc.)
+edges = [(1,2), (2,3), (1,3)]
+weights = [1.0, 2.5, 1.2]
+wg = build_weighted_graph(edges, weights; directed=false)
 
-# Directed edge indices (1:num_directed_edges)  
-edge_flows = Vector{Float64}(undef, num_directed_edges(g))
-flow_uv = edge_flows[find_directed_edge_index(g, u, v)]
-flow_vu = edge_flows[find_directed_edge_index(g, v, u)]  # Different index</code></pre><h3 id="**Informative-Edge-Iteration**"><a class="docs-heading-anchor" href="#**Informative-Edge-Iteration**"><strong>Informative Edge Iteration</strong></a><a id="**Informative-Edge-Iteration**-1"></a><a class="docs-heading-anchor-permalink" href="#**Informative-Edge-Iteration**" title="Permalink"></a></h3><p>GraphCore provides helpful display for edge iterators to make debugging easier:</p><pre><code class="language-julia hljs">g = build_graph(CoreGraph, [(1,2), (2,3), (1,3)]; directed=false)
+# Access weights efficiently
+for (neighbor, weight) in neighbor_weights(wg, 1)
+    println(&quot;Edge to $neighbor has weight $weight&quot;)
+end
 
-# Edge iterators show helpful information
+# Add weighted edges
+add_edge!(wg, 1, 4, 3.7)</code></pre><h3 id="**PropertyGraph**-Graphs-with-Custom-Data"><a class="docs-heading-anchor" href="#**PropertyGraph**-Graphs-with-Custom-Data"><strong>PropertyGraph</strong> - Graphs with Custom Data</a><a id="**PropertyGraph**-Graphs-with-Custom-Data-1"></a><a class="docs-heading-anchor-permalink" href="#**PropertyGraph**-Graphs-with-Custom-Data" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Best for: Attaching custom data to vertices and edges
+vertices = [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Charlie&quot;]
+edges = [(1,2), (2,3), (1,3)]
+edge_types = [&quot;friend&quot;, &quot;colleague&quot;, &quot;family&quot;]
+
+pg = build_property_graph(edges, vertices, edge_types; directed=false)
+
+# Access properties
+println(&quot;Vertex 1 is: $(vertex_property(pg, 1))&quot;)
+println(&quot;Edge (1,2) type: $(edge_property(pg, 1, 2))&quot;)</code></pre><h3 id="**AdjGraph**-Dynamic-Modification"><a class="docs-heading-anchor" href="#**AdjGraph**-Dynamic-Modification"><strong>AdjGraph</strong> - Dynamic Modification</a><a id="**AdjGraph**-Dynamic-Modification-1"></a><a class="docs-heading-anchor-permalink" href="#**AdjGraph**-Dynamic-Modification" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Best for: Frequent edge additions/removals during construction
+g = build_adj_graph([(1,2)]; directed=false)
+
+# Very fast mutations
+add_edge!(g, 2, 3)  # O(1)
+add_edge!(g, 3, 4)  # O(1)
+remove_edge!(g, 1, 2)  # O(degree)</code></pre><h2 id="Common-Workflows"><a class="docs-heading-anchor" href="#Common-Workflows">Common Workflows</a><a id="Common-Workflows-1"></a><a class="docs-heading-anchor-permalink" href="#Common-Workflows" title="Permalink"></a></h2><h3 id="Building-Graphs"><a class="docs-heading-anchor" href="#Building-Graphs">Building Graphs</a><a id="Building-Graphs-1"></a><a class="docs-heading-anchor-permalink" href="#Building-Graphs" title="Permalink"></a></h3><p><strong>From edge lists:</strong></p><pre><code class="language-julia hljs"># Simple unweighted graph
+edges = [(1,2), (2,3), (3,4), (4,1)]
+g = build_core_graph(edges; directed=true)
+
+# With weights
+weights = [1.0, 2.0, 1.5, 0.8]
+wg = build_weighted_graph(edges, weights; directed=true)</code></pre><p><strong>Incrementally with GraphBuilder:</strong></p><pre><code class="language-julia hljs">using GraphCore.GraphConstruction
+
+builder = WeightedGraphBuilder(Float64; directed=false)
+add_edge!(builder, 1, 2; weight=1.5)
+add_edge!(builder, 2, 3; weight=2.0)
+add_edge!(builder, 1, 3; weight=1.0)
+
+# Convert to your preferred graph type
+core_g = build_graph(builder, CoreGraph)      # For analysis
+adj_g = build_graph(builder, AdjGraph)        # For further modifications</code></pre><p><strong>From other graph libraries:</strong></p><pre><code class="language-julia hljs">using GraphCore.Conversions
+using Graphs
+
+# From Graphs.jl
+simple_g = SimpleGraph(5)
+add_edge!(simple_g, 1, 2)
+our_g = from_graphs_jl(simple_g)
+
+# To Graphs.jl  
+graphs_g = to_graphs_jl(our_g)</code></pre><h3 id="Graph-Analysis"><a class="docs-heading-anchor" href="#Graph-Analysis">Graph Analysis</a><a id="Graph-Analysis-1"></a><a class="docs-heading-anchor-permalink" href="#Graph-Analysis" title="Permalink"></a></h3><p><strong>Basic queries:</strong></p><pre><code class="language-julia hljs">g = build_core_graph([(1,2), (2,3), (1,3)]; directed=false)
+
+# Graph properties
+println(&quot;Vertices: $(num_vertices(g))&quot;)
+println(&quot;Edges: $(num_edges(g))&quot;)
+println(&quot;Directed: $(is_directed(g))&quot;)
+
+# Vertex queries
+println(&quot;Degree of vertex 1: $(degree(g, 1))&quot;)
+println(&quot;Neighbors: $(collect(neighbor_indices(g, 1)))&quot;)
+
+# Edge queries  
+println(&quot;Has edge (1,2): $(has_edge(g, 1, 2))&quot;)</code></pre><p><strong>Iteration patterns:</strong></p><pre><code class="language-julia hljs"># Iterate over all vertices
+for v in vertices(g)
+    println(&quot;Processing vertex $v&quot;)
+end
+
+# Iterate over all edges
+for (u, v) in edges(g)
+    println(&quot;Edge: $u → $v&quot;)
+end
+
+# Iterate over neighbors efficiently
+for v in vertices(g)
+    for neighbor in neighbor_indices(g, v)
+        println(&quot;$v is connected to $neighbor&quot;)
+    end
+end</code></pre><h3 id="Graph-Modification"><a class="docs-heading-anchor" href="#Graph-Modification">Graph Modification</a><a id="Graph-Modification-1"></a><a class="docs-heading-anchor-permalink" href="#Graph-Modification" title="Permalink"></a></h3><p><strong>Adding elements:</strong></p><pre><code class="language-julia hljs">g = build_core_graph([(1,2)]; directed=false)
+
+# Add vertices and edges
+new_vertex = add_vertex!(g)  # Returns vertex index
+add_edge!(g, 1, new_vertex)
+add_edge!(g, 2, new_vertex)
+
+# For weighted graphs
+wg = build_weighted_graph([(1,2)], [1.0]; directed=false)
+add_edge!(wg, 1, 3, 2.5)  # vertex 3, weight 2.5</code></pre><p><strong>Removing elements:</strong></p><pre><code class="language-julia hljs"># Remove edges
+remove_edge!(g, 1, 2)
+
+# Remove vertices (removes all connected edges)
+remove_vertex!(g, 3)</code></pre><h3 id="Converting-Between-Types"><a class="docs-heading-anchor" href="#Converting-Between-Types">Converting Between Types</a><a id="Converting-Between-Types-1"></a><a class="docs-heading-anchor-permalink" href="#Converting-Between-Types" title="Permalink"></a></h3><p><strong>Easy conversions:</strong></p><pre><code class="language-julia hljs"># Start with one type
+adj_g = build_adj_graph([(1,2), (2,3)]; directed=false)
+
+# Convert as needed
+core_g = CoreGraph(adj_g)           # For fast analysis
+weighted_g = WeightedGraph(core_g)  # Add weight support
+property_g = PropertyGraph(core_g, [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;], [&quot;edge1&quot;, &quot;edge2&quot;])</code></pre><p><strong>Type-safe conversions:</strong></p><pre><code class="language-julia hljs">directed_g = build_core_graph([(1,2)]; directed=true)
+
+# This prevents mistakes:
+# undirected_g = CoreGraph{false}(directed_g)  # Would throw error!
+
+# Explicit conversion when you know what you&#39;re doing:
+undirected_g = CoreGraph{false}(edges(directed_g))  # OK</code></pre><h2 id="Working-with-Properties"><a class="docs-heading-anchor" href="#Working-with-Properties">Working with Properties</a><a id="Working-with-Properties-1"></a><a class="docs-heading-anchor-permalink" href="#Working-with-Properties" title="Permalink"></a></h2><p><strong>Vertex properties:</strong></p><pre><code class="language-julia hljs">names = [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Charlie&quot;]
+g = build_property_graph([(1,2), (2,3)], names, String[]; directed=false)
+
+# Access properties
+println(vertex_property(g, 1))  # &quot;Alice&quot;
+
+# Modify properties
+set_vertex_property!(g, 1, &quot;Alice Smith&quot;)</code></pre><p><strong>Edge properties:</strong></p><pre><code class="language-julia hljs">edges = [(1,2), (2,3)]
+edge_labels = [&quot;friend&quot;, &quot;colleague&quot;]
+g = build_property_graph(edges, String[], edge_labels; directed=false)
+
+# Access edge properties
+println(edge_property(g, 1, 2))  # &quot;friend&quot;</code></pre><h2 id="Integration-with-Graphs.jl"><a class="docs-heading-anchor" href="#Integration-with-Graphs.jl">Integration with Graphs.jl</a><a id="Integration-with-Graphs.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Integration-with-Graphs.jl" title="Permalink"></a></h2><p>GraphCore graphs work seamlessly with the Graphs.jl ecosystem:</p><pre><code class="language-julia hljs">using Graphs, GraphCore
+
+g = build_core_graph([(1,2), (2,3), (1,3)]; directed=false)
+
+# Standard Graphs.jl functions work
+println(&quot;Vertices: $(nv(g))&quot;)
+println(&quot;Edges: $(ne(g))&quot;)
+println(&quot;Neighbors of 1: $(outneighbors(g, 1))&quot;)
+
+# Algorithms work too
+using SimpleWeightedGraphs
+wg = build_weighted_graph([(1,2), (2,3)], [1.0, 2.0]; directed=false)
+paths = dijkstra_shortest_paths(wg, 1)</code></pre><h2 id="Safety-and-Performance"><a class="docs-heading-anchor" href="#Safety-and-Performance">Safety and Performance</a><a id="Safety-and-Performance-1"></a><a class="docs-heading-anchor-permalink" href="#Safety-and-Performance" title="Permalink"></a></h2><h3 id="Bounds-Checking"><a class="docs-heading-anchor" href="#Bounds-Checking">Bounds Checking</a><a id="Bounds-Checking-1"></a><a class="docs-heading-anchor-permalink" href="#Bounds-Checking" title="Permalink"></a></h3><p>GraphCore provides safe access by default with optimizations available:</p><pre><code class="language-julia hljs">g = build_core_graph([(1,2), (2,3)]; directed=false)
+
+# Safe by default
+try
+    neighbor_indices(g, 10)  # BoundsError: vertex 10 out of bounds
+catch e
+    println(&quot;Caught: $e&quot;)
+end
+
+# Optimize when you know access is safe
+function fast_algorithm(g, valid_vertices)
+    for v in valid_vertices
+        # @inbounds skips bounds checking for speed
+        neighbors = @inbounds neighbor_indices(g, v)
+        # ... fast inner loop
+    end
+end</code></pre><h3 id="Edge-Iterator-Information"><a class="docs-heading-anchor" href="#Edge-Iterator-Information">Edge Iterator Information</a><a id="Edge-Iterator-Information-1"></a><a class="docs-heading-anchor-permalink" href="#Edge-Iterator-Information" title="Permalink"></a></h3><p>GraphCore provides helpful edge iterator displays:</p><pre><code class="language-julia hljs">g = build_core_graph([(1,2), (2,3), (1,3)]; directed=false)
+
 println(edges(g))
 # Output: &quot;EdgeIterator over 3 edges from CoreGraph (undirected): (1, 2), (1, 3), (2, 3)&quot;
 
-println(all_directed_edges(g))  
-# Output: &quot;EdgeIterator over 6 directed edges from CoreGraph (undirected): (1, 2), (1, 3), (2, 1), ...&quot;
-
-# Empty graphs show clearly
-empty_g = build_graph(CoreGraph, Tuple{Int,Int}[]; n=3, directed=false) 
-println(edges(empty_g))
-# Output: &quot;EdgeIterator over 0 edges from CoreGraph (undirected)&quot;</code></pre><p>The display shows:</p><ul><li><strong>Edge count</strong>: Total number of edges the iterator will yield</li><li><strong>Graph type</strong>: Whether it&#39;s CoreGraph, WeightedGraph, AdjGraph, etc.</li><li><strong>Directedness</strong>: Whether the underlying graph is directed or undirected  </li><li><strong>Preview</strong>: First few edges to give you a sense of the data</li><li><strong>Iterator type</strong>: Clear distinction between <code>edges()</code> and <code>all_directed_edges()</code></li></ul><h3 id="**Seamless-Conversions**"><a class="docs-heading-anchor" href="#**Seamless-Conversions**"><strong>Seamless Conversions</strong></a><a id="**Seamless-Conversions**-1"></a><a class="docs-heading-anchor-permalink" href="#**Seamless-Conversions**" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Idiomatic Julia constructors for easy conversion
-core_g = CoreGraph(adj_graph)           # Any graph → CSR format
-weighted_g = WeightedGraph(core_g)      # Add weight support  
-adj_g = AdjGraph(weighted_g)            # Convert to adjacency lists
-
-# Type-safe conversions with directedness enforcement
-directed_g = CoreGraph{true}(undirected_g)   # Throws error - prevents mistakes
-undirected_g = CoreGraph{false}(directed_g)  # Throws error - type safety
-
-# Construction workflow
-using GraphCore.GraphConstruction
-builder = WeightedGraphBuilder(Float64; directed=false)
-# ... build graph incrementally ...
-analysis_graph = build_graph(builder, CoreGraph)    # → CSR for analysis
-mutable_graph = build_graph(builder, AdjGraph)      # → Adj lists for mutations
-
-# Graphs.jl interop
-using GraphCore.Conversions
-our_graph = from_graphs_jl(simple_graph)
-graphs_jl_g = to_graphs_jl(core_graph)</code></pre><h2 id="Usage-Examples"><a class="docs-heading-anchor" href="#Usage-Examples">Usage Examples</a><a id="Usage-Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Usage-Examples" title="Permalink"></a></h2><h3 id="Basic-Graph-Construction"><a class="docs-heading-anchor" href="#Basic-Graph-Construction">Basic Graph Construction</a><a id="Basic-Graph-Construction-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-Graph-Construction" title="Permalink"></a></h3><pre><code class="language-julia hljs">using GraphCore
-
-# Simple unweighted graph - unified interface
-edge_list = [(1,2), (2,3), (1,3)]
-g = build_graph(CoreGraph, edge_list; directed=false)
-
-# Weighted graph - type-safe construction
-weights = [1.0, 2.0, 1.5]
-wg = build_graph(WeightedGraph{Float64}, edge_list; weights=weights, directed=false)
-
-# Property graph
-vertex_names = [&quot;Alice&quot;, &quot;Bob&quot;, &quot;Charlie&quot;]  
-edge_types = [&quot;friend&quot;, &quot;colleague&quot;, &quot;family&quot;]
-pg = build_graph(PropertyGraph{CoreGraph,String,String}, edge_list; 
-                 vertex_properties=vertex_names, edge_properties=edge_types, directed=false)
-
-# Easy conversions between types
-adj_g = AdjGraph(g)          # Convert to adjacency list
-core_g = CoreGraph(adj_g)    # Convert back to CSR</code></pre><h3 id="Incremental-Construction"><a class="docs-heading-anchor" href="#Incremental-Construction">Incremental Construction</a><a id="Incremental-Construction-1"></a><a class="docs-heading-anchor-permalink" href="#Incremental-Construction" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Using GraphBuilder for dynamic construction
-using GraphCore.GraphConstruction
-
-builder = WeightedGraphBuilder(Float64; directed=true)
-
-add_vertex!(builder)  # Returns vertex index
-add_edge!(builder, 1, 2; weight=1.5)
-add_edge!(builder, 2, 3; weight=2.0)
-
-# Convert to optimized storage when done
-graph = build_graph(builder)</code></pre><h3 id="Efficient-Algorithms"><a class="docs-heading-anchor" href="#Efficient-Algorithms">Efficient Algorithms</a><a id="Efficient-Algorithms-1"></a><a class="docs-heading-anchor-permalink" href="#Efficient-Algorithms" title="Permalink"></a></h3><pre><code class="language-julia hljs"># O(1) neighbor and weight access
-function dijkstra_step(g, distances, v)
-    for (neighbor, weight) in neighbor_weights(g, v)
-        new_dist = distances[v] + weight
-        if new_dist &lt; distances[neighbor]
-            distances[neighbor] = new_dist
-        end
-    end
-end
-
-# O(1) index access during neighbor iteration
-for (i, neighbor) in enumerate(neighbor_indices(g, v))
-    edge_idx = edge_index(g, v, i)           # O(1) - no search!
-    weight = edge_weights(g, v)[i]           # O(1) - direct access
-end
-
-# External property arrays with stable indexing
-edge_flows = zeros(num_directed_edges(g))
-for (u, v) in edges(g)
-    flow_idx = find_directed_edge_index(g, u, v)
-    edge_flows[flow_idx] = compute_flow(u, v)
-end</code></pre><h3 id="Mutable-Graph-Operations"><a class="docs-heading-anchor" href="#Mutable-Graph-Operations">Mutable Graph Operations</a><a id="Mutable-Graph-Operations-1"></a><a class="docs-heading-anchor-permalink" href="#Mutable-Graph-Operations" title="Permalink"></a></h3><pre><code class="language-julia hljs"># All graph types support efficient mutations
-g = build_graph(CoreGraph, initial_edges; directed=false)
-wg = build_graph(WeightedGraph{Float64}, initial_edges; weights=weights, directed=false)
-
-# Efficient mutations on all types
-new_vertex = add_vertex!(g)               # O(1) vertex addition
-edge_added = add_edge!(g, 1, new_vertex)  # Efficient edge addition
-add_edge!(wg, 1, 2, 3.5)                 # Add weighted edge
-
-# Inspect your changes with informative edge iterators
-println(edges(g))  # Shows: &quot;EdgeIterator over 4 edges from CoreGraph (undirected): (1,2), (1,3), ...&quot;
-
-# For property graphs - choose the right base type
-pg_core = build_graph(PropertyGraph{CoreGraph,String,String}, edges; 
-                      vertex_properties=vprops, edge_properties=eprops)
-add_edge!(pg_core, u, v, &quot;new_edge&quot;)     # Efficient with CoreGraph base
-
-# Convert if you need different mutation characteristics  
-pg_adj = PropertyGraph(AdjGraph(pg_core.graph), pg_core.vertex_properties, pg_core.edge_properties)</code></pre><h2 id="Performance-Best-Practices"><a class="docs-heading-anchor" href="#Performance-Best-Practices">Performance Best Practices</a><a id="Performance-Best-Practices-1"></a><a class="docs-heading-anchor-permalink" href="#Performance-Best-Practices" title="Permalink"></a></h2><h3 id="**When-to-Use-@inbounds**"><a class="docs-heading-anchor" href="#**When-to-Use-@inbounds**"><strong>When to Use <code>@inbounds</code></strong></a><a id="**When-to-Use-@inbounds**-1"></a><a class="docs-heading-anchor-permalink" href="#**When-to-Use-@inbounds**" title="Permalink"></a></h3><p>Use <code>@inbounds</code> in performance-critical inner loops where you can guarantee safety:</p><pre><code class="language-julia hljs"># ✅ SAFE: After explicit validation
-function safe_fast_algorithm(g, valid_vertices)
-    # Pre-validate all vertices are in bounds
-    @assert all(has_vertex(g, v) for v in valid_vertices)
-    
-    for v in valid_vertices
-        # Safe to use @inbounds - we validated vertices above
-        neighbors = @inbounds neighbor_indices(g, v)
-        for (i, neighbor) in enumerate(neighbors)
-            edge_idx = @inbounds directed_edge_index(g, v, i)
-            # Fast operations...
-        end
-    end
-end
-
-# ✅ SAFE: With explicit bounds checking
-function process_edge_if_exists(g, u, v)
-    @boundscheck begin
-        has_vertex(g, u) || return nothing
-        has_vertex(g, v) || return nothing
-    end
-    # Safe to use @inbounds after validation
-    return @inbounds find_directed_edge_index(g, u, v)
-end
-
-# ❌ UNSAFE: Don&#39;t use @inbounds on user input
-function unsafe_example(g, user_vertex)
-    # DON&#39;T DO THIS - user_vertex might be out of bounds!
-    neighbors = @inbounds neighbor_indices(g, user_vertex)  # Potential crash
-end</code></pre><h3 id="**Bounds-Checking-Control**"><a class="docs-heading-anchor" href="#**Bounds-Checking-Control**"><strong>Bounds Checking Control</strong></a><a id="**Bounds-Checking-Control**-1"></a><a class="docs-heading-anchor-permalink" href="#**Bounds-Checking-Control**" title="Permalink"></a></h3><pre><code class="language-julia hljs"># For maximum performance in production (after thorough testing):
-# julia --check-bounds=no script.jl
-
-# For development and debugging (default):
-# julia --check-bounds=yes script.jl
-
-# Selective optimization in functions:
-function hot_path(g, vertices)
-    # Bounds checking here for user input
-    for v in vertices
-        has_vertex(g, v) || continue
-        
-        # @inbounds in inner loop for speed
-        neighbors = @inbounds neighbor_indices(g, v)
-        process_neighbors(neighbors)
-    end
-end</code></pre><h3 id="**Memory-and-Cache-Optimization**"><a class="docs-heading-anchor" href="#**Memory-and-Cache-Optimization**"><strong>Memory and Cache Optimization</strong></a><a id="**Memory-and-Cache-Optimization**-1"></a><a class="docs-heading-anchor-permalink" href="#**Memory-and-Cache-Optimization**" title="Permalink"></a></h3><pre><code class="language-julia hljs"># ✅ GOOD: Use CoreGraph for analysis workloads
-analysis_graph = build_core_graph(edges; directed=false)
-
-# ✅ GOOD: Batch operations for cache efficiency
-function efficient_traversal(g)
-    for v in vertices(g)
-        neighbors = neighbor_indices(g, v)  # O(1) view, cache-friendly
-        for neighbor in neighbors
-            # Process all neighbors together
-        end
-    end
-end
-
-# ❌ AVOID: Repeated edge lookups
-function inefficient_example(g, pairs)
-    for (u, v) in pairs
-        if has_edge(g, u, v)  # O(degree) lookup each time
-            # This is slow for large graphs
-        end
-    end
-end
-
-# ✅ BETTER: Pre-compute or batch process
-function efficient_edge_checking(g, pairs)
-    edge_set = Set{Tuple{Int,Int}}()
-    for (u, v) in edges(g)
-        push!(edge_set, (u, v))
-        push!(edge_set, (v, u))  # For undirected graphs
-    end
-    
-    for (u, v) in pairs
-        if (u, v) in edge_set  # O(1) lookup
-            # Fast processing
-        end
-    end
-end</code></pre><h2 id="Performance-Characteristics"><a class="docs-heading-anchor" href="#Performance-Characteristics">Performance Characteristics</a><a id="Performance-Characteristics-1"></a><a class="docs-heading-anchor-permalink" href="#Performance-Characteristics" title="Permalink"></a></h2><table><tr><th style="text-align: right">Operation</th><th style="text-align: right">CoreGraph</th><th style="text-align: right">WeightedGraph</th><th style="text-align: right">AdjGraph</th><th style="text-align: right">PropertyGraph</th><th style="text-align: right">PropertyAdjGraph</th></tr><tr><td style="text-align: right">Neighbor Access</td><td style="text-align: right">O(1), ~2ns</td><td style="text-align: right">O(1), ~2ns</td><td style="text-align: right">O(1), ~2ns</td><td style="text-align: right">O(1), ~2ns</td><td style="text-align: right">O(1), ~2ns</td></tr><tr><td style="text-align: right">Edge Lookup</td><td style="text-align: right">O(degree), ~3ns</td><td style="text-align: right">O(degree), ~3ns</td><td style="text-align: right">O(degree), ~3ns</td><td style="text-align: right">O(degree), ~3ns</td><td style="text-align: right">O(degree), ~3ns</td></tr><tr><td style="text-align: right">Bounds Checking</td><td style="text-align: right">✅ <code>@boundscheck</code></td><td style="text-align: right">✅ <code>@boundscheck</code></td><td style="text-align: right">✅ <code>@boundscheck</code></td><td style="text-align: right">✅ <code>@boundscheck</code></td><td style="text-align: right">✅ <code>@boundscheck</code></td></tr><tr><td style="text-align: right">@inbounds Safe</td><td style="text-align: right">✅ Performance</td><td style="text-align: right">✅ Performance</td><td style="text-align: right">✅ Performance</td><td style="text-align: right">✅ Performance</td><td style="text-align: right">✅ Performance</td></tr><tr><td style="text-align: right">Add Edge</td><td style="text-align: right">✅ Efficient</td><td style="text-align: right">✅ Efficient</td><td style="text-align: right">O(1)</td><td style="text-align: right">✅ Efficient*</td><td style="text-align: right">O(1)</td></tr><tr><td style="text-align: right">Remove Edge</td><td style="text-align: right">✅ Efficient</td><td style="text-align: right">✅ Efficient</td><td style="text-align: right">O(degree)</td><td style="text-align: right">✅ Efficient*</td><td style="text-align: right">O(degree)</td></tr><tr><td style="text-align: right">Add Vertex</td><td style="text-align: right">✅ O(1)</td><td style="text-align: right">✅ O(1)</td><td style="text-align: right">O(1)</td><td style="text-align: right">✅ O(1)*</td><td style="text-align: right">O(1)</td></tr><tr><td style="text-align: right">Remove Vertex</td><td style="text-align: right">✅ Efficient</td><td style="text-align: right">✅ Efficient</td><td style="text-align: right">O(V+E)</td><td style="text-align: right">✅ Efficient*</td><td style="text-align: right">O(V+E)</td></tr><tr><td style="text-align: right">Input Validation</td><td style="text-align: right">✅ Comprehensive</td><td style="text-align: right">✅ Comprehensive</td><td style="text-align: right">✅ Basic</td><td style="text-align: right">✅ Comprehensive</td><td style="text-align: right">✅ Basic</td></tr><tr><td style="text-align: right">Memory Overhead</td><td style="text-align: right">Minimal</td><td style="text-align: right">+weights</td><td style="text-align: right">+pointers</td><td style="text-align: right">+properties</td><td style="text-align: right">+properties+pointers</td></tr><tr><td style="text-align: right">Cache Efficiency</td><td style="text-align: right">Excellent</td><td style="text-align: right">Excellent</td><td style="text-align: right">Good</td><td style="text-align: right">Excellent**</td><td style="text-align: right">Good**</td></tr></table><p>*PropertyGraph inherits mutation performance from its underlying graph type. **PropertyGraph inherits the performance characteristics of its underlying graph type.</p><p><strong>Performance notes:</strong></p><ul><li>Timings are median benchmarks on typical graphs (Petersen graph: 10 vertices, 15 edges)</li><li>All operations benefit from <code>@inbounds</code> optimizations in performance-critical loops</li><li>Bounds checking can be disabled globally with <code>--check-bounds=no</code> for maximum speed</li><li>Edge lookup time depends on vertex degree but benefits from cache-efficient CSR layout</li></ul><h2 id="Graphs.jl-Compatibility"><a class="docs-heading-anchor" href="#Graphs.jl-Compatibility">Graphs.jl Compatibility</a><a id="Graphs.jl-Compatibility-1"></a><a class="docs-heading-anchor-permalink" href="#Graphs.jl-Compatibility" title="Permalink"></a></h2><p>GraphCore implements the <code>AbstractGraph</code> interface for seamless integration:</p><pre><code class="language-julia hljs">using Graphs
-using GraphCore
-using GraphCore.Conversions
-
-g = build_core_graph(edge_list; directed=false)
-
-# Standard Graphs.jl functions work
-nv(g)                    # Number of vertices  
-ne(g)                    # Number of edges
-outneighbors(g, v)       # Neighbor list
-is_directed(g)           # Check directedness
-
-# Algorithm compatibility
-shortest_paths = dijkstra_shortest_paths(g, source)
-
-# Convert to/from Graphs.jl types
-simple_g = to_graphs_jl(g)
-our_g = from_graphs_jl(simple_g)</code></pre><h2 id="Design-Decisions-and-Trade-offs"><a class="docs-heading-anchor" href="#Design-Decisions-and-Trade-offs">Design Decisions &amp; Trade-offs</a><a id="Design-Decisions-and-Trade-offs-1"></a><a class="docs-heading-anchor-permalink" href="#Design-Decisions-and-Trade-offs" title="Permalink"></a></h2><h3 id="Why-Julia-Idiomatic-Bounds-Checking?"><a class="docs-heading-anchor" href="#Why-Julia-Idiomatic-Bounds-Checking?">Why Julia-Idiomatic Bounds Checking?</a><a id="Why-Julia-Idiomatic-Bounds-Checking?-1"></a><a class="docs-heading-anchor-permalink" href="#Why-Julia-Idiomatic-Bounds-Checking?" title="Permalink"></a></h3><ul><li><strong>Safety First</strong>: All vertex/edge access is safe by default with clear error messages</li><li><strong>Performance When Needed</strong>: <code>@inbounds</code> provides zero-cost optimization for validated access</li><li><strong>Familiar Pattern</strong>: Follows Julia&#39;s array indexing conventions that users already know</li><li><strong>Trade-off</strong>: Small overhead in tight loops, but eliminates silent corruption bugs</li></ul><h3 id="Why-CSR-for-CoreGraph?"><a class="docs-heading-anchor" href="#Why-CSR-for-CoreGraph?">Why CSR for CoreGraph?</a><a id="Why-CSR-for-CoreGraph?-1"></a><a class="docs-heading-anchor-permalink" href="#Why-CSR-for-CoreGraph?" title="Permalink"></a></h3><ul><li><strong>Cache Efficiency</strong>: Neighbors stored contiguously in memory</li><li><strong>Space Efficiency</strong>: No pointer overhead compared to adjacency lists  </li><li><strong>Index Stability</strong>: External arrays remain valid during graph analysis</li><li><strong>Efficient Mutations</strong>: Direct array manipulation preserves CSR benefits</li><li><strong>Trade-off</strong>: More complex mutation algorithms, but maintains performance characteristics</li></ul><h3 id="Why-Dual-Indexing?"><a class="docs-heading-anchor" href="#Why-Dual-Indexing?">Why Dual Indexing?</a><a id="Why-Dual-Indexing?-1"></a><a class="docs-heading-anchor-permalink" href="#Why-Dual-Indexing?" title="Permalink"></a></h3><ul><li><strong>Flexibility</strong>: Support both shared and directional edge properties</li><li><strong>Performance</strong>: O(1) access during iteration via <code>edge_index(g, v, i)</code></li><li><strong>Correctness</strong>: Clear separation between undirected and directed semantics</li><li><strong>Trade-off</strong>: Slightly more complex API, but with clear documentation</li></ul><h3 id="Why-Multiple-Graph-Types?"><a class="docs-heading-anchor" href="#Why-Multiple-Graph-Types?">Why Multiple Graph Types?</a><a id="Why-Multiple-Graph-Types?-1"></a><a class="docs-heading-anchor-permalink" href="#Why-Multiple-Graph-Types?" title="Permalink"></a></h3><ul><li><strong>Specialization</strong>: Each type optimized for its use case</li><li><strong>Composability</strong>: PropertyGraph wraps any base type</li><li><strong>Migration Path</strong>: Easy conversion between representations</li><li><strong>Trade-off</strong>: More types to learn, but unified interface</li></ul></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="api/">API Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Saturday 6 September 2025 15:27">Saturday 6 September 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+# Shows: edge count, graph type, directedness, and preview</code></pre><h2 id="Next-Steps"><a class="docs-heading-anchor" href="#Next-Steps">Next Steps</a><a id="Next-Steps-1"></a><a class="docs-heading-anchor-permalink" href="#Next-Steps" title="Permalink"></a></h2><ul><li><strong><a href="design/">Design Philosophy</a></strong> - Architecture and performance details  </li><li><strong><a href="api/">API Reference</a></strong> - Complete function documentation</li><li><strong>Examples</strong> - Check the <code>examples/</code> directory for:<ul><li>Performance benchmarks</li><li>Algorithm implementations</li><li>Plotting examples</li><li>Graphs.jl integration</li></ul></li></ul><h2 id="Need-Help?"><a class="docs-heading-anchor" href="#Need-Help?">Need Help?</a><a id="Need-Help?-1"></a><a class="docs-heading-anchor-permalink" href="#Need-Help?" title="Permalink"></a></h2><ul><li>Check the examples in the <code>examples/</code> directory</li><li>Look at the comprehensive test suite in <code>test/</code></li><li>See the API reference for detailed function documentation</li></ul></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="design/">Design Philosophy »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Saturday 6 September 2025 17:26">Saturday 6 September 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
