@@ -477,37 +477,15 @@ end
 
 """
     CoreGraph(g::GraphInterface) -> CoreGraph
+    CoreGraph{D}(g::GraphInterface) -> CoreGraph{D}
 
-Convert any GraphInterface implementation to a CoreGraph using constructor syntax.
-This is an idiomatic Julia alternative to `to_core_graph(g)`.
+Constructor-based conversion from any GraphInterface to CoreGraph.
+The type-safe variant validates directedness matching.
 
-# Examples
-```julia
-# Constructor style (idiomatic)
-core_g = CoreGraph(adj_graph)
-
-# Equivalent to conversion function
-core_g = to_core_graph(adj_graph)
-```
+See [`to_core_graph`](@ref) for detailed documentation.
 """
 CoreGraph(g::GraphInterface) = to_core_graph(g)
 
-"""
-    CoreGraph{D}(g::GraphInterface) -> CoreGraph{D}
-
-Convert any GraphInterface to a CoreGraph with explicit directedness type parameter.
-The source graph must have the same directedness as specified by the type parameter.
-
-# Examples
-```julia
-# Type-safe conversions (will succeed)
-directed_core = CoreGraph{true}(directed_adj_graph)
-undirected_core = CoreGraph{false}(undirected_adj_graph)
-
-# Type mismatch (will throw TypeError)
-# CoreGraph{true}(undirected_graph)  # ERROR!
-```
-"""
 function CoreGraph{D}(g::GraphInterface) where D
     @assert is_directed_graph(g) == D "Directedness mismatch: CoreGraph{$D} requires $(D ? "directed" : "undirected") graph, got $(is_directed_graph(g) ? "directed" : "undirected") graph"
     return to_core_graph(g)
@@ -518,30 +496,11 @@ end
     WeightedGraph{W}(g::WeightedGraphInterface{W}) -> WeightedGraph{W}
     WeightedGraph{W,D}(g::WeightedGraphInterface{W}) -> WeightedGraph{W,D}
 
-Convert any WeightedGraphInterface to a WeightedGraph using constructor syntax.
+Constructor-based conversion from any WeightedGraphInterface to WeightedGraph.
 Supports multiple forms with different levels of type specification.
+The type-safe variant validates directedness matching.
 
-# Constructor Forms
-- `WeightedGraph(g)`: Auto-infer weight type and directedness
-- `WeightedGraph{W}(g)`: Explicit weight type parameter
-- `WeightedGraph{W,D}(g)`: Explicit weight type and directedness parameters (with type assertion)
-
-# Examples
-```julia
-# Basic constructor (auto-infer types)
-weighted_g = WeightedGraph(weighted_adj_graph)
-
-# Explicit weight type
-weighted_g = WeightedGraph{Float64}(adj_graph)
-
-# Full type specification with directedness assertion
-directed_weighted = WeightedGraph{Float64,true}(directed_weighted_graph)   # ✅ OK
-undirected_weighted = WeightedGraph{Float64,false}(undirected_weighted_graph) # ✅ OK
-# WeightedGraph{Float64,true}(undirected_graph)  # ❌ ERROR: directedness mismatch
-
-# Equivalent to conversion function
-weighted_g = to_weighted_graph(weighted_adj_graph)
-```
+See [`to_weighted_graph`](@ref) for detailed documentation.
 """
 WeightedGraph(g::WeightedGraphInterface{W}) where W = to_weighted_graph(g)
 WeightedGraph{W}(g::WeightedGraphInterface{W}) where W = to_weighted_graph(g)
@@ -734,15 +693,9 @@ build_weighted_graph(edges, weights::AbstractVector{W}; directed::Bool=true, kwa
 
 Add a new isolated vertex to the graph and return its index.
 
-**Efficient Implementation**: O(1) operation that simply extends the vertex_offsets array.
+**CoreGraph-specific**: O(1) operation extending vertex_offsets array.
 
-# Example
-```julia
-g = build_core_graph([(1,2), (2,3)]; directed=false)
-new_vertex = add_vertex!(g)  # Returns 4
-@assert num_vertices(g) == 4
-@assert length(neighbor_indices(g, new_vertex)) == 0  # Isolated vertex
-```
+See [`add_vertex!`](@ref) for the general interface documentation.
 """
 function add_vertex!(g::CoreGraph{D}) where D
     # Simply extend vertex_offsets with the same offset as the last vertex
@@ -756,18 +709,12 @@ end
 """
     add_edge!(g::CoreGraph, u::Integer, v::Integer) -> Int32
 
-Add an edge from u to v and return the edge index (or 0 if edge already exists).
+Add an edge from vertex u to vertex v and return the edge index.
 
-**Efficient Implementation**: O(degree) operation that extends the CSR arrays and updates offsets.
+**CoreGraph-specific**: O(degree) operation that extends CSR arrays and updates vertex offsets.
+Most efficient for graphs that are mostly static after construction.
 
-For undirected graphs, this adds the edge in both directions internally.
-
-# Example
-```julia
-g = build_core_graph([(1,2)]; directed=false)
-edge_idx = add_edge!(g, 1, 3)  # Returns edge index
-@assert has_edge(g, 1, 3) && has_edge(g, 3, 1)  # Both directions for undirected
-```
+See [`add_edge!`](@ref) for the general interface documentation.
 """
 function add_edge!(g::CoreGraph{D}, u::Integer, v::Integer) where D
     # Validate vertices exist
@@ -841,21 +788,10 @@ end
     remove_vertex!(g::CoreGraph, v::Integer) -> Bool
 
 Remove vertex v and all its incident edges from the graph.
-Returns true if successful, false if vertex doesn't exist.
 
-⚠️  **Performance Note**: O(V + E) operation due to vertex renumbering requirement.
-⚠️  **Index Invalidation**: Removes vertex v and renumbers vertices v+1, v+2, ... to v, v+1, ...
-This invalidates any external arrays indexed by vertex numbers.
+**CoreGraph-specific**: O(V+E) operation requiring CSR array rebuilding and vertex renumbering.
 
-**Implementation**: More efficient than full reconstruction but still requires renumbering.
-
-# Example
-```julia
-g = build_core_graph([(1,2), (2,3), (1,3)]; directed=false)
-success = remove_vertex!(g, 2)  # Returns true
-@assert num_vertices(g) == 2
-@assert has_edge(g, 1, 2)  # What was vertex 3 is now vertex 2
-```
+See [`remove_vertex!`](@ref) for the general interface documentation.
 """
 function remove_vertex!(g::CoreGraph{D}, v::Integer) where D
     if !has_vertex(g, v)
@@ -954,19 +890,11 @@ end
 """
     remove_edge!(g::CoreGraph, u::Integer, v::Integer) -> Bool
 
-Remove the edge from u to v from the graph.
-Returns true if successful, false if edge doesn't exist.
+Remove the edge from vertex u to vertex v from the graph.
 
-**Efficient Implementation**: O(degree) operation that removes entries from CSR arrays and updates offsets.
+**CoreGraph-specific**: O(degree) operation removing entries from CSR arrays and updating offsets.
 
-For frequent mutations, consider using AdjGraph instead.
-
-# Example
-```julia
-g = build_core_graph([(1,2), (2,3), (1,3)]; directed=false)
-success = remove_edge!(g, 1, 2)  # Returns true
-@assert !has_edge(g, 1, 2) && !has_edge(g, 2, 1)  # Both directions removed for undirected
-```
+See [`remove_edge!`](@ref) for the general interface documentation.
 """
 function remove_edge!(g::CoreGraph{D}, u::Integer, v::Integer) where D
     # Validate vertices exist
@@ -1054,9 +982,12 @@ end
 """
     add_edge!(g::WeightedGraph{W}, u::Integer, v::Integer, weight::W) -> Int32
 
-Add a weighted edge from u to v and return the edge index (or 0 if edge already exists).
+Add a weighted edge from vertex u to vertex v and return the edge index.
 
-**Efficient Implementation**: O(degree) operation that extends the CSR arrays and updates offsets.
+**WeightedGraph-specific**: Adds edge with type-safe weight storage.
+Weight type `W` must match the graph's weight type.
+
+See [`add_edge!`](@ref) for the general interface documentation.
 """
 function add_edge!(g::WeightedGraph{W,D}, u::Integer, v::Integer, weight::W) where {W,D}
     # Validate vertices exist
@@ -1128,21 +1059,10 @@ end
     remove_vertex!(g::WeightedGraph, v::Integer) -> Bool
 
 Remove vertex v and all its incident edges from the weighted graph.
-Returns true if successful, false if vertex doesn't exist.
 
-⚠️  **Performance Note**: O(V + E) operation due to vertex renumbering requirement.
-⚠️  **Index Invalidation**: Removes vertex v and renumbers vertices v+1, v+2, ... to v, v+1, ...
-This invalidates any external arrays indexed by vertex numbers.
+**WeightedGraph-specific**: O(V+E) operation with CSR rebuilding and weight array maintenance.
 
-**Implementation**: More efficient than full reconstruction but still requires renumbering.
-
-# Example
-```julia
-g = build_weighted_graph([(1,2,1.0), (2,3,2.0), (1,3,3.0)]; directed=false)
-success = remove_vertex!(g, 2)  # Returns true
-@assert num_vertices(g) == 2
-@assert has_edge(g, 1, 2)  # What was vertex 3 is now vertex 2
-```
+See [`remove_vertex!`](@ref) for the general interface documentation.
 """
 function remove_vertex!(g::WeightedGraph{W,D}, v::Integer) where {W,D}
     if !has_vertex(g, v)
@@ -1244,10 +1164,11 @@ end
 """
     remove_edge!(g::WeightedGraph, u::Integer, v::Integer) -> Bool
 
-Remove the edge from u to v from the weighted graph.
-Returns true if successful, false if edge doesn't exist.
+Remove the edge from vertex u to vertex v from the weighted graph.
 
-**Efficient Implementation**: O(degree) operation that removes entries from CSR arrays and updates offsets.
+**WeightedGraph-specific**: O(degree) operation removing CSR entries and weight data.
+
+See [`remove_edge!`](@ref) for the general interface documentation.
 """
 function remove_edge!(g::WeightedGraph{W,D}, u::Integer, v::Integer) where {W,D}
     # Validate vertices exist

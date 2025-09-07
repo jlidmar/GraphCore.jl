@@ -499,37 +499,15 @@ end
 
 """
     AdjGraph(g::GraphInterface) -> AdjGraph
+    AdjGraph{D}(g::GraphInterface) -> AdjGraph{D}
 
-Convert any GraphInterface implementation to an AdjGraph using constructor syntax.
-This is an idiomatic Julia alternative to `to_adj_graph(g)`.
+Constructor-based conversion from any GraphInterface to AdjGraph.
+The type-safe variant validates directedness matching.
 
-# Examples
-```julia
-# Constructor style (idiomatic)
-adj_g = AdjGraph(core_graph)
-
-# Equivalent to conversion function
-adj_g = to_adj_graph(core_graph)
-```
+See [`to_adj_graph`](@ref) for detailed documentation.
 """
 AdjGraph(g::GraphInterface) = to_adj_graph(g)
 
-"""
-    AdjGraph{D}(g::GraphInterface) -> AdjGraph{D}
-
-Convert any GraphInterface to an AdjGraph with explicit directedness type parameter.
-The source graph must have the same directedness as specified by the type parameter.
-
-# Examples
-```julia
-# Type-safe conversions (will succeed)
-directed_adj = AdjGraph{true}(directed_core_graph)
-undirected_adj = AdjGraph{false}(undirected_core_graph)
-
-# Type mismatch (will throw AssertionError)
-# AdjGraph{true}(undirected_graph)  # ERROR!
-```
-"""
 function AdjGraph{D}(g::GraphInterface) where D
     @assert is_directed_graph(g) == D "Directedness mismatch: AdjGraph{$D} requires $(D ? "directed" : "undirected") graph, got $(is_directed_graph(g) ? "directed" : "undirected") graph"
     return to_adj_graph(g)
@@ -540,31 +518,11 @@ end
     WeightedAdjGraph{W}(g::WeightedGraphInterface{W}) -> WeightedAdjGraph{W}
     WeightedAdjGraph{W,D}(g::WeightedGraphInterface{W}) -> WeightedAdjGraph{W,D}
 
-Convert any WeightedGraphInterface to a WeightedAdjGraph using constructor syntax.
+Constructor-based conversion from any WeightedGraphInterface to WeightedAdjGraph.
 Supports multiple forms with different levels of type specification.
+The type-safe variant validates directedness matching.
 
-# Constructor Forms
-- `WeightedAdjGraph(g)`: Auto-infer weight type and directedness
-- `WeightedAdjGraph{W}(g)`: Explicit weight type parameter
-- `WeightedAdjGraph{W,D}(g)`: Explicit weight type and directedness parameters
-
-# Examples
-```julia
-# Basic constructor (auto-infer types)
-weighted_adj = WeightedAdjGraph(weighted_core_graph)
-
-# Explicit weight type
-weighted_adj = WeightedAdjGraph{Float64}(core_graph)
-
-# Full type specification
-# Full type specification with directedness assertion
-directed_weighted_adj = WeightedAdjGraph{Float64,true}(directed_weighted_graph)   # ✅ OK
-undirected_weighted_adj = WeightedAdjGraph{Float64,false}(undirected_weighted_graph) # ✅ OK
-# WeightedAdjGraph{Float64,true}(undirected_graph)  # ❌ ERROR: directedness mismatch
-
-# Equivalent to conversion function
-weighted_adj = to_weighted_adj_graph(weighted_core_graph)
-```
+See [`to_weighted_adj_graph`](@ref) for detailed documentation.
 """
 WeightedAdjGraph(g::WeightedGraphInterface{W}) where W = to_weighted_adj_graph(g)
 WeightedAdjGraph{W}(g::WeightedGraphInterface{W}) where W = to_weighted_adj_graph(g)
@@ -738,29 +696,9 @@ end
 
 Add a new isolated vertex to the graph and return its index.
 
-# Performance
-- **Time Complexity**: O(1)
-- **Space Complexity**: O(1) - just adds empty vectors
-- **Index Stability**: All existing vertex/edge indices remain valid
+**AdjGraph-specific**: O(1) operation creating empty neighbor lists.
 
-# Implementation Details
-Creates empty neighbor list and empty neighbor_to_edge mapping.
-New vertex has no neighbors initially and can be connected via `add_edge!`.
-
-# Examples
-```julia
-g = build_adj_graph([(1,2), (2,3)]; directed=false)
-@assert num_vertices(g) == 3
-
-new_v = add_vertex!(g)
-@assert new_v == 4
-@assert num_vertices(g) == 4
-@assert degree(g, new_v) == 0  # Isolated vertex
-
-# Connect new vertex
-add_edge!(g, 1, new_v)
-@assert degree(g, new_v) == 1
-```
+See [`add_vertex!`](@ref) for the general interface documentation.
 """
 function add_vertex!(g::AdjGraph)
     new_vertex = num_vertices(g) + 1
@@ -777,8 +715,11 @@ end
 """
     add_vertex!(g::WeightedAdjGraph{W}) -> Int32 where W
 
-Add a new vertex to the weighted graph and return its index.
-The new vertex has no neighbors initially.
+Add a new isolated vertex to the weighted graph and return its index.
+
+**WeightedAdjGraph-specific**: O(1) operation creating empty neighbor and weight lists.
+
+See [`add_vertex!`](@ref) for the general interface documentation.
 """
 function add_vertex!(g::WeightedAdjGraph{W}) where W
     new_vertex = num_vertices(g) + 1
@@ -798,39 +739,12 @@ end
 """
     add_edge!(g::AdjGraph, u::Integer, v::Integer) -> Int32
 
-Add an edge from u to v and return the edge index (or 0 if already exists).
+Add an edge from vertex u to vertex v and return the edge index.
 
-# Performance
-- **Time Complexity**: O(1) amortized (vector push operations)
-- **Space Complexity**: O(1) per direction
-- **Index Stability**: All existing indices remain valid, new edge gets max+1
+**AdjGraph-specific**: O(1) amortized operation using vector push.
+Most efficient for dynamic graphs with frequent edge additions.
 
-# Behavior Details
-- **Directed graphs**: Adds only u→v edge
-- **Undirected graphs**: Adds both u→v and v→u internally with same edge index
-- **Duplicate detection**: Returns 0 if edge already exists (no modification)
-- **Index assignment**: New edges get next available index
-
-# Examples
-```julia
-g = build_adj_graph([(1,2)]; directed=false)
-@assert num_edges(g) == 1
-
-# Add new edge
-edge_idx = add_edge!(g, 2, 3)
-@assert edge_idx == 2  # Next available index
-@assert num_edges(g) == 2
-@assert has_edge(g, 2, 3) && has_edge(g, 3, 2)  # Both directions for undirected
-
-# Try duplicate
-duplicate_idx = add_edge!(g, 1, 2)
-@assert duplicate_idx == 0  # Already exists
-@assert num_edges(g) == 2    # No change
-```
-
-# Error Conditions
-Throws `BoundsError` if vertices u or v don't exist in the graph.
-Use `add_vertex!` first if needed.
+See [`add_edge!`](@ref) for the general interface documentation.
 """
 function add_edge!(g::AdjGraph, u::Integer, v::Integer)
     u32, v32 = Int32(u), Int32(v)
@@ -866,9 +780,11 @@ end
 """
     add_edge!(g::WeightedAdjGraph{W}, u::Integer, v::Integer, weight::W) -> Int32
 
-Add a weighted edge from u to v in the graph.
-Returns the edge index of the newly added edge, or 0 if edge already exists.
-For undirected graphs, both directions get the same weight.
+Add a weighted edge from vertex u to vertex v and return the edge index.
+
+**WeightedAdjGraph-specific**: O(1) amortized with type-safe weight storage.
+
+See [`add_edge!`](@ref) for the general interface documentation.
 """
 function add_edge!(g::WeightedAdjGraph{W}, u::Integer, v::Integer, weight::W) where W
     u32, v32 = Int32(u), Int32(v)
@@ -907,46 +823,10 @@ end
     remove_vertex!(g::AdjGraph, v::Integer) -> Bool
 
 Remove vertex v and all its incident edges from the graph.
-Returns true if successful, false if vertex doesn't exist.
 
-# Performance
-- **Time Complexity**: O(V + incident_edges) - must update all vertex references
-- **Space Complexity**: O(1) - only removes data
-- **Index Stability**: ⚠️ **BREAKS STABILITY** - vertex indices > v are decremented
+**AdjGraph-specific**: O(V+E) operation requiring updates to all vertex references and array compaction.
 
-# Implementation Details
-1. **Edge Removal**: All incident edges are removed first (affects edge count)
-2. **Vertex Deletion**: Vertex v is removed from adjacency structures
-3. **Index Update**: All references to vertices > v are decremented by 1
-4. **Property Cleanup**: For PropertyGraph, properties are also removed
-
-# Index Invalidation Warning
-```julia
-g = build_adj_graph([(1,2), (2,3), (3,4)]; directed=false)
-# Before: vertices [1,2,3,4], vertex 3 has neighbors [2,4]
-
-success = remove_vertex!(g, 2)  # Remove vertex 2
-# After: vertices [1,2,3], old vertex 3→new vertex 2, old vertex 4→new vertex 3
-# ⚠️ External arrays indexed by old vertex numbers are now INVALID!
-
-# External vertex properties become inconsistent:
-vertex_labels = ["A", "B", "C", "D"]  # Indexed by old vertex numbers
-# After removal: vertex_labels[3] no longer corresponds to current vertex 3!
-```
-
-# Safe Usage Patterns
-```julia
-# ✅ SAFE: Use PropertyGraph for automatic property management
-pg = PropertyGraph(g, vertex_labels, edge_labels)
-remove_vertex!(pg, 2)  # Properties automatically updated
-
-# ✅ SAFE: Rebuild external arrays after removal
-external_data = rebuild_after_removal(external_data, removed_vertex)
-
-# ❌ UNSAFE: Assume external arrays remain valid after removal
-remove_vertex!(g, v)
-old_label = vertex_labels[some_vertex]  # May be wrong!
-```
+See [`remove_vertex!`](@ref) for the general interface documentation.
 """
 function remove_vertex!(g::AdjGraph, v::Integer)
     v32 = Int32(v)
@@ -994,46 +874,10 @@ end
     remove_vertex!(g::WeightedAdjGraph, v::Integer) -> Bool
 
 Remove vertex v and all its incident edges from the weighted graph.
-Returns true if successful, false if vertex doesn't exist.
 
-# Performance
-- **Time Complexity**: O(V + incident_edges) - must update all vertex references
-- **Space Complexity**: O(1) - only removes data
-- **Index Stability**: ⚠️ **BREAKS STABILITY** - vertex indices > v are decremented
+**WeightedAdjGraph-specific**: O(V+E) operation with weight array maintenance and vertex reference updates.
 
-# Implementation Details
-1. **Edge Removal**: All incident edges are removed first (affects edge count)
-2. **Vertex Deletion**: Vertex v is removed from adjacency structures
-3. **Index Update**: All references to vertices > v are decremented by 1
-4. **Property Cleanup**: For PropertyGraph, properties are also removed
-
-# Index Invalidation Warning
-```julia
-g = build_weighted_adj_graph([(1,2), (2,3), (3,4)]; directed=false)
-# Before: vertices [1,2,3,4], vertex 3 has neighbors [2,4]
-
-success = remove_vertex!(g, 2)  # Remove vertex 2
-# After: vertices [1,2,3], old vertex 3→new vertex 2, old vertex 4→new vertex 3
-# ⚠️ External arrays indexed by old vertex numbers are now INVALID!
-
-# External vertex properties become inconsistent:
-vertex_labels = ["A", "B", "C", "D"]  # Indexed by old vertex numbers
-# After removal: vertex_labels[3] no longer corresponds to current vertex 3!
-```
-
-# Safe Usage Patterns
-```julia
-# ✅ SAFE: Use PropertyGraph for automatic property management
-pg = PropertyGraph(g, vertex_labels, edge_labels)
-remove_vertex!(pg, 2)  # Properties automatically updated
-
-# ✅ SAFE: Rebuild external arrays after removal
-external_data = rebuild_after_removal(external_data, removed_vertex)
-
-# ❌ UNSAFE: Assume external arrays remain valid after removal
-remove_vertex!(g, v)
-old_label = vertex_labels[some_vertex]  # May be wrong!
-```
+See [`remove_vertex!`](@ref) for the general interface documentation.
 """
 function remove_vertex!(g::WeightedAdjGraph, v::Integer)
     v32 = Int32(v)
@@ -1080,56 +924,11 @@ end
 """
     remove_edge!(g::AdjGraph, u::Integer, v::Integer) -> Bool
 
-Remove the edge from u to v from the graph.
-Returns true if successful, false if edge doesn't exist.
+Remove the edge from vertex u to vertex v from the graph.
 
-# Performance
-- **Time Complexity**: O(degree(u)) + O(degree(v)) for undirected
-- **Space Complexity**: O(1) - only removes data
-- **Index Stability**: ⚠️ **MAY BREAK STABILITY** - edge indices may be invalidated
+**AdjGraph-specific**: O(degree) operation using linear search in neighbor lists.
 
-# Implementation Details
-- **Directed graphs**: Removes only u→v edge
-- **Undirected graphs**: Removes both u→v and v→u internal representations
-- **Search cost**: Linear search in neighbor vectors to find edge
-- **Array operations**: Uses `deleteat!` which may shift subsequent elements
-
-# Edge Index Invalidation
-```julia
-g = build_adj_graph([(1,2), (2,3), (1,3)]; directed=false)
-# Edge indices: (1,2)→1, (2,3)→2, (1,3)→3
-
-# External edge data
-edge_weights = [1.0, 2.0, 1.5]  # Indexed by edge indices
-
-remove_edge!(g, 2, 3)  # Remove edge with index 2
-# Now: remaining edges (1,2)→1, (1,3)→?
-# ⚠️ Edge index for (1,3) may have changed!
-# edge_weights[2] might now refer to wrong edge
-```
-
-# Safe Usage Patterns
-```julia
-# ✅ SAFE: Use PropertyGraph for automatic edge property management
-pg = PropertyGraph(g, vertex_props, edge_props)
-remove_edge!(pg, u, v)  # Edge properties automatically maintained
-
-# ✅ SAFE: Use edge-based operations instead of index-based
-for (u, v) in edges(g)
-    weight = compute_weight_from_vertices(u, v)  # No index dependency
-end
-
-# ❌ UNSAFE: Assume edge indices remain stable across removals
-edge_data = Vector{Float64}(undef, num_edges(g))
-remove_edge!(g, u, v)
-# edge_data indices now potentially inconsistent!
-```
-
-# Performance Considerations
-For graphs with frequent edge removals, consider:
-1. **Batch operations**: Remove many edges at once, then rebuild external arrays
-2. **Alternative storage**: Use Dict{Tuple{Int,Int}, T} for edge properties
-3. **Conversion workflow**: AdjGraph for building → CoreGraph for analysis
+See [`remove_edge!`](@ref) for the general interface documentation.
 """
 function remove_edge!(g::AdjGraph, u::Integer, v::Integer)
     u32, v32 = Int32(u), Int32(v)
@@ -1182,56 +981,11 @@ end
 """
     remove_edge!(g::WeightedAdjGraph, u::Integer, v::Integer) -> Bool
 
-Remove the weighted edge from u to v from the graph.
-Returns true if successful, false if edge doesn't exist.
+Remove the weighted edge from vertex u to vertex v from the graph.
 
-# Performance
-- **Time Complexity**: O(degree(u)) + O(degree(v)) for undirected
-- **Space Complexity**: O(1) - only removes data
-- **Index Stability**: ⚠️ **MAY BREAK STABILITY** - edge indices may be invalidated
+**WeightedAdjGraph-specific**: O(degree) operation with weight array maintenance.
 
-# Implementation Details
-- **Directed graphs**: Removes only u→v edge
-- **Undirected graphs**: Removes both u→v and v→u internal representations
-- **Search cost**: Linear search in neighbor vectors to find edge
-- **Array operations**: Uses `deleteat!` which may shift subsequent elements
-
-# Edge Index Invalidation
-```julia
-g = build_weighted_adj_graph([(1,2), (2,3), (1,3)]; directed=false)
-# Edge indices: (1,2)→1, (2,3)→2, (1,3)→3
-
-# External edge data
-edge_weights = [1.0, 2.0, 1.5]  # Indexed by edge indices
-
-remove_edge!(g, 2, 3)  # Remove edge with index 2
-# Now: remaining edges (1,2)→1, (1,3)→?
-# ⚠️ Edge index for (1,3) may have changed!
-# edge_weights[2] might now refer to wrong edge
-```
-
-# Safe Usage Patterns
-```julia
-# ✅ SAFE: Use PropertyGraph for automatic edge property management
-pg = PropertyGraph(g, vertex_props, edge_props)
-remove_edge!(pg, u, v)  # Edge properties automatically maintained
-
-# ✅ SAFE: Use edge-based operations instead of index-based
-for (u, v) in edges(g)
-    weight = compute_weight_from_vertices(u, v)  # No index dependency
-end
-
-# ❌ UNSAFE: Assume edge indices remain stable across removals
-edge_data = Vector{Float64}(undef, num_edges(g))
-remove_edge!(g, u, v)
-# edge_data indices now potentially inconsistent!
-```
-
-# Performance Considerations
-For graphs with frequent edge removals, consider:
-1. **Batch operations**: Remove many edges at once, then rebuild external arrays
-2. **Alternative storage**: Use Dict{Tuple{Int,Int}, T} for edge properties
-3. **Conversion workflow**: AdjGraph for building → CoreGraph for analysis
+See [`remove_edge!`](@ref) for the general interface documentation.
 """
 function remove_edge!(g::WeightedAdjGraph, u::Integer, v::Integer)
     u32, v32 = Int32(u), Int32(v)

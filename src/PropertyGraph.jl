@@ -241,11 +241,12 @@ end
 """
     add_edge!(g::PropertyGraph{G,V,E}, u::Integer, v::Integer, edge_prop::E) -> Int32
 
-Add an edge from u to v with the specified edge property.
-Returns the edge index of the newly added edge, or 0 if edge already exists.
+Add an edge from vertex u to vertex v with an edge property and return the edge index.
 
-Only available when the base graph type supports `add_edge!`.
-Property arrays are automatically maintained.
+**PropertyGraph-specific**: Adds edge with type-safe property storage.
+Inherits base graph performance plus minimal property overhead.
+
+See [`add_edge!`](@ref) for the general interface documentation.
 """
 function add_edge!(g::PropertyGraph{G,V,E}, u::Integer, v::Integer, edge_prop::E) where {G,V,E}
     edge_idx = add_edge!(g.core, u, v)
@@ -277,13 +278,11 @@ end
     remove_vertex!(g::PropertyGraph, v::Integer) -> Bool
 
 Remove vertex v and all its incident edges from the property graph.
-Returns true if successful, false if vertex doesn't exist.
 
-Only available when the base graph type supports `remove_vertex!`.
-Property arrays are automatically maintained and indices updated.
+**PropertyGraph-specific**: Automatic property management with vertex renumbering.
+Inherits base graph performance characteristics.
 
-⚠️  **Index Invalidation Warning**: Removing vertices renumbers remaining vertices
-and invalidates external arrays indexed by vertex numbers.
+See [`remove_vertex!`](@ref) for the general interface documentation.
 """
 function remove_vertex!(g::PropertyGraph, v::Integer)
     success = remove_vertex!(g.core, v)
@@ -307,14 +306,12 @@ end
 """
     remove_edge!(g::PropertyGraph, u::Integer, v::Integer) -> Bool
 
-Remove the edge from u to v from the property graph.
-Returns true if successful, false if edge doesn't exist.
+Remove the edge from vertex u to vertex v from the property graph.
 
-Only available when the base graph type supports `remove_edge!`.
-Property arrays are automatically maintained.
+**PropertyGraph-specific**: Automatic property management with edge removal.
+Inherits base graph performance characteristics.
 
-⚠️  **Index Invalidation Warning**: Removing edges may invalidate edge indices
-and external arrays indexed by edge numbers.
+See [`remove_edge!`](@ref) for the general interface documentation.
 """
 function remove_edge!(g::PropertyGraph, u::Integer, v::Integer)
     # Get the edge index before removal for property cleanup

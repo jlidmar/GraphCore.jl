@@ -437,39 +437,197 @@ function set_edge_weight! end
 # ==============================================================================
 
 """
-    add_vertex!(g::GraphInterface, ...) -> Int32
+    add_vertex!(g::GraphInterface, [vertex_property]) -> Int32
 
-Add a new vertex with optional properties.
-Returns the index of the newly added vertex.
-Only available for mutable graph types.
+Add a new isolated vertex to the graph with optional vertex property.
+
+# Returns  
+- Index (Int32) of the newly added vertex
+
+# Behavior
+- **New vertex**: Has no neighbors initially (degree 0)
+- **Index assignment**: Gets the next available vertex index (typically `num_vertices(g) + 1`)
+- **Index stability**: All existing vertex/edge indices remain valid
+- **Connections**: Use `add_edge!` to connect the new vertex to others
+
+# Type-Specific Performance
+- `CoreGraph`: O(1) - extends vertex arrays
+- `AdjGraph`: O(1) - pushes to vertex arrays  
+- `WeightedGraph`: O(1) - same as base type
+- `PropertyGraph`: O(1) - same as base type + property storage
+
+# Property Handling
+- **No properties**: `add_vertex!(g)` - adds vertex without properties
+- **With properties**: `add_vertex!(g, prop)` - property type must match graph's vertex property type
+
+# Examples
+```julia
+# Add vertex without properties
+g = build_graph(AdjGraph, [(1,2)]; directed=false)
+new_v = add_vertex!(g)  # Returns 3
+add_edge!(g, 1, new_v)  # Connect to existing vertex
+
+# Add vertex with property
+pg = build_graph(PropertyGraph{AdjGraph,String,Nothing}, [(1,2)]; 
+                 directed=false, vertex_properties=["Alice", "Bob"])
+new_v = add_vertex!(pg, "Charlie")  # Returns 3 with property
+```
+
+# Availability
+Only available for mutable graph types (`AdjGraph`, `WeightedAdjGraph`, `PropertyGraph` with mutable base).
 """
 function add_vertex! end
 
 """
-    add_edge!(g::GraphInterface, u::Integer, v::Integer, ...) -> Int32
+    add_edge!(g::GraphInterface, u::Integer, v::Integer, [weight], [edge_property]) -> Int32
 
-Add an edge from u to v with the optinal properties.
-Returns the edge index of the newly added edge, or 0 if edge already exists.
-For undirected graphs, this adds the edge in both directions internally.
-Only available for mutable graph types.
+Add an edge from vertex `u` to vertex `v` with optional weight and/or edge property.
+
+# Returns
+- Edge index (Int32) of the newly added edge
+- `0` if the edge already exists (no modification performed)
+
+# Behavior
+- **Directed graphs**: Adds only u→v edge
+- **Undirected graphs**: Adds both u→v and v→u internally (same edge index)  
+- **Index assignment**: New edges get the next available edge index
+- **Duplicate detection**: Checks if edge exists before adding
+- **Index stability**: Existing edge/vertex indices remain valid after addition
+
+# Type-Specific Performance
+- `CoreGraph`: O(degree) - extends CSR arrays, efficient for static analysis
+- `AdjGraph`: O(1) amortized - vector push operations, efficient for dynamic graphs
+- `WeightedGraph`: Same as base type + weight storage
+- `PropertyGraph`: Same as base type + property storage
+
+# Error Conditions
+- Throws `BoundsError` if either vertex doesn't exist
+- For weighted graphs, weight type must match graph's weight type
+- For property graphs, property type must match graph's edge property type
+
+# Examples
+```julia
+# Basic edge addition
+g = build_graph(CoreGraph, [(1,2)]; directed=false)
+edge_idx = add_edge!(g, 1, 3)  # Returns edge index
+
+# Weighted edge
+wg = build_graph(WeightedGraph, [(1,2,1.0)]; directed=true)  
+edge_idx = add_edge!(wg, 2, 3, 2.5)  # Add weighted edge
+
+# Property edge
+pg = build_graph(PropertyGraph{AdjGraph,Nothing,String}, [(1,2)]; 
+                 directed=false, edge_properties=["friendship"])
+edge_idx = add_edge!(pg, 1, 3, "colleague")  # Add edge with property
+```
+
+# Availability
+Only available for mutable graph types (`AdjGraph`, `WeightedAdjGraph`, `PropertyGraph` with mutable base).
 """
 function add_edge! end
 
 """
     remove_vertex!(g::GraphInterface, v::Integer) -> Bool
 
-Remove vertex v and all its incident edges.
-Returns true if successful, false if vertex doesn't exist.
-Only available for mutable graph types.
+Remove vertex `v` and all its incident edges from the graph.
+
+# Returns
+- `true` if vertex was successfully removed
+- `false` if vertex doesn't exist (no modification performed)
+
+# Behavior
+- **Edge removal**: All edges incident to vertex `v` are automatically removed
+- **Index compaction**: Vertices with indices > `v` are renumbered to fill the gap
+- **Property handling**: Vertex and edge properties are automatically maintained
+- **Index invalidation**: Vertex indices > `v` become invalid after removal
+
+# Type-Specific Performance
+- `CoreGraph`: O(V+E) - rebuilds CSR arrays with compacted indices
+- `AdjGraph`: O(V+E) - updates all vertex references and compacts arrays
+- `WeightedGraph`: Same as base type + weight array maintenance
+- `PropertyGraph`: Same as base type + property array maintenance
+
+# Index Management
+After removing vertex `v`, all vertices with indices > `v` get decremented by 1:
+- Vertex `v+1` becomes vertex `v`
+- Vertex `v+2` becomes vertex `v+1`, etc.
+- External arrays indexed by vertex must be updated accordingly
+
+# Error Conditions
+- No error for non-existent vertices (returns `false`)
+- For property graphs, properties are removed automatically
+
+# Examples
+```julia
+# Basic vertex removal
+g = build_graph(AdjGraph, [(1,2), (2,3), (1,3)]; directed=false)
+success = remove_vertex!(g, 2)  # Remove vertex 2, returns true
+# Vertex 3 is now vertex 2, edges (1,3) becomes (1,2)
+
+# Property graph vertex removal
+pg = build_graph(PropertyGraph{AdjGraph,String,Nothing}, [(1,2), (2,3)]; 
+                 directed=false, vertex_properties=["Alice", "Bob", "Charlie"])
+remove_vertex!(pg, 2)  # Removes "Bob", "Charlie" becomes vertex 2
+```
+
+# Availability
+Only available for mutable graph types (`AdjGraph`, `WeightedAdjGraph`, `PropertyGraph` with mutable base).
+
+# ⚠️ Important
+This operation invalidates vertex indices > `v`. Update any external data structures accordingly.
 """
 function remove_vertex! end
 
 """
     remove_edge!(g::GraphInterface, u::Integer, v::Integer) -> Bool
 
-Remove the edge from u to v.
-Returns true if successful, false if edge doesn't exist.
-Only available for mutable graph types.
+Remove the edge from vertex `u` to vertex `v`.
+
+# Returns
+- `true` if edge was successfully removed
+- `false` if edge doesn't exist (no modification performed)
+
+# Behavior
+- **Directed graphs**: Removes only the u→v edge
+- **Undirected graphs**: Removes both u→v and v→u edges (same operation)
+- **Edge properties**: Automatically removed for property graphs
+- **Index stability**: Vertex indices remain unchanged, edge indices may be affected
+
+# Type-Specific Performance
+- `CoreGraph`: O(degree) - updates CSR arrays and shifts subsequent edges
+- `AdjGraph`: O(degree) - searches neighbor list and removes entry
+- `WeightedGraph`: Same as base type + weight removal
+- `PropertyGraph`: Same as base type + property removal
+
+# Edge Index Effects
+- **CoreGraph/WeightedGraph**: Edge indices may change for edges after the removed edge
+- **AdjGraph/WeightedAdjGraph**: Edge indices remain stable
+- **PropertyGraph**: Inherits behavior from base graph type
+
+# Error Conditions
+- No error for non-existent edges (returns `false`)
+- Throws `BoundsError` if either vertex doesn't exist
+
+# Examples
+```julia
+# Basic edge removal
+g = build_graph(AdjGraph, [(1,2), (2,3), (1,3)]; directed=false)
+success = remove_edge!(g, 1, 2)  # Returns true
+@assert !has_edge(g, 1, 2) && !has_edge(g, 2, 1)  # Both directions removed
+
+# Directed graph edge removal
+dg = build_graph(AdjGraph, [(1,2), (2,1)]; directed=true)
+remove_edge!(dg, 1, 2)  # Removes only 1→2
+@assert !has_edge(dg, 1, 2) && has_edge(dg, 2, 1)  # 2→1 still exists
+
+# Property graph edge removal
+pg = build_graph(PropertyGraph{AdjGraph,Nothing,String}, [(1,2), (2,3)]; 
+                 directed=false, edge_properties=["friend", "colleague"])
+remove_edge!(pg, 1, 2)  # Removes edge and "friend" property
+```
+
+# Availability
+Only available for mutable graph types (`AdjGraph`, `WeightedAdjGraph`, `PropertyGraph` with mutable base).
 """
 function remove_edge! end
 

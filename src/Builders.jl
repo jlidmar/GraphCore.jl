@@ -25,7 +25,7 @@ include("GraphBuilder.jl")
 # Generators
 export empty_graph, complete_graph, path_graph, cycle_graph
 export star_graph, grid_graph, random_graph, lattice_graph
-export erdos_renyi_graph, barabasi_albert_graph, wheel_graph, hypercubic_graph
+export erdos_renyi_graph, barabasi_albert_graph, wheel_graph
 
 include("Generators.jl")
 
