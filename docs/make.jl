@@ -24,4 +24,7 @@ makedocs(;
 deploydocs(;
     repo="github.com/jlidmar/GraphCore.jl",
     devbranch="main",
+    branch="gh-pages",
+    versions=["stable", "dev"]
+    # versions=["stable", "v0.4.2", "dev"]
 )
