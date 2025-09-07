@@ -1,7 +1,7 @@
 name = "GraphCore"
 uuid = "959eb29d-3b89-4f5f-bee6-61f8037ea4e1"
 authors = ["Jack Lidmar <jlidmar@kth.se>"]
-version = "0.4.0"
+version = "0.4.1"
 
 [deps]
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
@@ -11,12 +11,12 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
-Graphs = "1.13.1"
-LinearAlgebra = "1.11.0"
-SimpleWeightedGraphs = "1.5.0"
-SparseArrays = "1.11.0"
-StaticArrays = "1.9.14"
-julia = "1.10"
+Graphs = ">=1.13"
+LinearAlgebra = ">=1.10"
+SimpleWeightedGraphs = ">=1.5"
+SparseArrays = ">=1.10"
+StaticArrays = ">=1.9"
+julia = ">=1.10"
 
 [extras]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
