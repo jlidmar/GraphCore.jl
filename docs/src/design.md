@@ -36,28 +36,29 @@ GraphCore.jl
 
 ## Performance Characteristics
 
-| Operation | CoreGraph | WeightedGraph | AdjGraph | PropertyGraph | PropertyAdjGraph |
-|-----------|-----------|---------------|----------|---------------|------------------|
-| Neighbor Access | O(1), ~2ns | O(1), ~2ns | O(1), ~2ns | O(1), ~2ns | O(1), ~2ns |
-| Edge Lookup | O(degree), ~3ns | O(degree), ~3ns | O(degree), ~3ns | O(degree), ~3ns | O(degree), ~3ns |
-| Bounds Checking | ✅ `@boundscheck` | ✅ `@boundscheck` | ✅ `@boundscheck` | ✅ `@boundscheck` | ✅ `@boundscheck` |
-| @inbounds Safe | ✅ Performance | ✅ Performance | ✅ Performance | ✅ Performance | ✅ Performance |
-| Add Edge | ✅ Efficient | ✅ Efficient | O(1) | ✅ Efficient* | O(1) |
-| Remove Edge | ✅ Efficient | ✅ Efficient | O(degree) | ✅ Efficient* | O(degree) |
-| Add Vertex | ✅ O(1) | ✅ O(1) | O(1) | ✅ O(1)* | O(1) |
-| Remove Vertex | ✅ Efficient | ✅ Efficient | O(V+E) | ✅ Efficient* | O(V+E) |
-| Input Validation | ✅ Comprehensive | ✅ Comprehensive | ✅ Basic | ✅ Comprehensive | ✅ Basic |
-| Memory Overhead | Minimal | +weights | +pointers | +properties | +properties+pointers |
-| Cache Efficiency | Excellent | Excellent | Good | Excellent** | Good** |
+| Operation | CoreGraph | WeightedGraph | AdjGraph | PropertyGraph |
+|-----------|-----------|---------------|----------|---------------|
+| Neighbor Access | O(1) view | O(1) view | O(1) direct | O(1) + property* |
+| Edge Lookup | O(degree) | O(degree) | O(degree) | O(degree) + property* |
+| Bounds Checking | ✅ `@boundscheck` | ✅ `@boundscheck` | ✅ `@boundscheck` | ✅ `@boundscheck` |
+| @inbounds Safe | ✅ Full support | ✅ Full support | ✅ Full support | ✅ Full support |
+| Add Edge | O(1) amortized | O(1) amortized | O(1) + has_edge check | Inherits base type* |
+| Remove Edge | O(degree) | O(degree) | O(degree) | Inherits base type* |
+| Add Vertex | O(1) | O(1) | O(1) | O(1) + property* |
+| Remove Vertex | O(V+E) rebuild | O(V+E) rebuild | O(V+E) | Inherits base type* |
+| Input Validation | ✅ Comprehensive | ✅ Comprehensive | ✅ Basic | ✅ Comprehensive |
+| Memory Layout | CSR (cache-friendly) | CSR + weights | Adjacency lists | Base + properties |
+| Memory Overhead | Minimal | +weights array | +pointer arrays | +property arrays |
 
-*PropertyGraph inherits mutation performance from its underlying graph type.
-**PropertyGraph inherits the performance characteristics of its underlying graph type.
+*PropertyGraph wraps any base graph type and inherits its performance characteristics, plus minimal property access overhead.
 
-**Performance notes:**
-- Timings are median benchmarks on typical graphs (Petersen graph: 10 vertices, 15 edges)
-- All operations benefit from `@inbounds` optimizations in performance-critical loops
-- Bounds checking can be disabled globally with `--check-bounds=no` for maximum speed
-- Edge lookup time depends on vertex degree but benefits from cache-efficient CSR layout
+**Real-world performance notes:**
+- Neighbor access: ~10-50ns per vertex depending on graph size and memory layout
+- Edge operations: Times vary significantly with vertex degree and graph structure  
+- All operations benefit from `@inbounds` when bounds are pre-validated
+- Use `--check-bounds=no` for maximum performance in production after testing
+- CSR layout provides better cache efficiency for traversal-heavy algorithms
+- Property access adds minimal overhead when types are concrete
 
 ## Design Decisions & Trade-offs
 

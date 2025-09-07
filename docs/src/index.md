@@ -47,7 +47,7 @@ GraphCore provides four main graph types, each optimized for different use cases
 # Best for: Fast queries, analysis algorithms, memory efficiency
 g = build_core_graph([(1,2), (2,3), (1,3)]; directed=false)
 
-# Lightning-fast neighbor access
+# Fast neighbor access
 for neighbor in neighbor_indices(g, 1)
     println("Neighbor: $neighbor")
 end
@@ -238,9 +238,11 @@ g = build_property_graph([(1,2), (2,3)], names, String[]; directed=false)
 
 # Access properties
 println(vertex_property(g, 1))  # "Alice"
+# or equivalently
+println(g[1])
 
 # Modify properties
-set_vertex_property!(g, 1, "Alice Smith")
+set_vertex_property!(g, 1, "Alice Smith") # of g[1] = ...
 ```
 
 **Edge properties:**
@@ -251,6 +253,8 @@ g = build_property_graph(edges, String[], edge_labels; directed=false)
 
 # Access edge properties
 println(edge_property(g, 1, 2))  # "friend"
+# or equivalently
+println(g[1 => 2])
 ```
 
 ## Integration with Graphs.jl
@@ -268,7 +272,6 @@ println("Edges: $(ne(g))")
 println("Neighbors of 1: $(outneighbors(g, 1))")
 
 # Algorithms work too
-using SimpleWeightedGraphs
 wg = build_weighted_graph([(1,2), (2,3)], [1.0, 2.0]; directed=false)
 paths = dijkstra_shortest_paths(wg, 1)
 ```
