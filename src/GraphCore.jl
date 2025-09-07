@@ -75,7 +75,7 @@ include("Conversions.jl")
 using .Conversions
 export from_graphs_jl, from_weighted_graphs_jl
 # Re-export commonly used conversions
-export to_adj_graph, to_core_graph, to_weighted_graph
+export to_adj_graph, to_core_graph, to_weighted_graph, to_weighted_adj_graph
 
 # Other graph types
 include("Lattices.jl")

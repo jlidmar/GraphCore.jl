@@ -9,8 +9,8 @@ module Lattices
 
 using StaticArrays: MVector, SVector
 
-import ..GraphCore: GraphInterface, num_vertices, num_edges, has_edge, neighbor_indices
-import ..GraphCore: is_directed_graph, find_edge_index, find_directed_edge_index
+import ..GraphCore: GraphInterface, num_vertices, num_edges, has_vertex, has_edge, neighbor_indices
+import ..GraphCore: is_directed_graph, find_edge_index, find_directed_edge_index, edge_index, directed_edge_index
 
 export HypercubicLattice
 export lattice_size, lattice_dimension, coord_to_vertex, vertex_to_coord
