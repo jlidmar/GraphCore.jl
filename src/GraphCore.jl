@@ -82,9 +82,6 @@ export to_adj_graph, to_core_graph, to_weighted_graph, to_weighted_adj_graph, to
 # Other graph types
 include("Lattices.jl")
 include("PowerOfTwoLattices.jl")
-using .Lattices, .PowerOfTwoLattices
 export Lattices, PowerOfTwoLattices
-export HypercubicLattice
-export PowerOfTwoLattice
 
 end # module GraphCore

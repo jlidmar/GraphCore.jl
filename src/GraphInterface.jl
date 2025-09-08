@@ -181,11 +181,11 @@ Find the undirected edge index for the edge between vertices u and v of the grap
 Returns 0 if no such edge exists.
 
 For undirected graphs: `find_edge_index(g, u, v) == find_edge_index(g, v, u)`
-For directed graphs: only finds the edge in the specified direction (u -> v)
+For directed graphs: only finds the edge in the specified direction (u -> v).
 
 This index is used for edge property access (shared properties) and
-for indexing external arrays of size num_edges(g).
-For directed graphs this is the same as `find_directed_edge_index(g, u, v)`
+for indexing external arrays of size `num_edges(g)`.
+For directed graphs this is the same as `find_directed_edge_index(g, u, v)`.
 """
 function find_edge_index end
 

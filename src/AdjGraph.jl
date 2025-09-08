@@ -691,15 +691,8 @@ end
 # MUTABLE GRAPH OPERATIONS FOR ADJACENCY LISTS
 # ==============================================================================
 
-"""
-    add_vertex!(g::AdjGraph) -> Int32
-
-Add a new isolated vertex to the graph and return its index.
-
-**AdjGraph-specific**: O(1) operation creating empty neighbor lists.
-
-See [`add_vertex!`](@ref) for the general interface documentation.
-"""
+# AdjGraph-specific: add_vertex!(g::AdjGraph) -> Int32
+# O(1) create empty neighbor lists; see GraphInterface.add_vertex! for API docs.
 function add_vertex!(g::AdjGraph)
     new_vertex = num_vertices(g) + 1
 
@@ -712,15 +705,8 @@ function add_vertex!(g::AdjGraph)
     return Int32(new_vertex)
 end
 
-"""
-    add_vertex!(g::WeightedAdjGraph{W}) -> Int32 where W
-
-Add a new isolated vertex to the weighted graph and return its index.
-
-**WeightedAdjGraph-specific**: O(1) operation creating empty neighbor and weight lists.
-
-See [`add_vertex!`](@ref) for the general interface documentation.
-"""
+# WeightedAdjGraph-specific: add_vertex!(g::WeightedAdjGraph{W}) -> Int32
+# O(1) create empty neighbor and weight lists; see GraphInterface.add_vertex! for API docs.
 function add_vertex!(g::WeightedAdjGraph{W}) where W
     new_vertex = num_vertices(g) + 1
 
@@ -736,16 +722,8 @@ function add_vertex!(g::WeightedAdjGraph{W}) where W
     return Int32(new_vertex)
 end
 
-"""
-    add_edge!(g::AdjGraph, u::Integer, v::Integer) -> Int32
-
-Add an edge from vertex u to vertex v and return the edge index.
-
-**AdjGraph-specific**: O(1) amortized operation using vector push.
-Most efficient for dynamic graphs with frequent edge additions.
-
-See [`add_edge!`](@ref) for the general interface documentation.
-"""
+# AdjGraph-specific: add_edge!(g::AdjGraph, u::Integer, v::Integer) -> Int32
+# O(1) amortized vector push; see GraphInterface.add_edge! for API docs.
 function add_edge!(g::AdjGraph, u::Integer, v::Integer)
     u32, v32 = Int32(u), Int32(v)
 
@@ -777,15 +755,8 @@ function add_edge!(g::AdjGraph, u::Integer, v::Integer)
     return new_edge_idx
 end
 
-"""
-    add_edge!(g::WeightedAdjGraph{W}, u::Integer, v::Integer, weight::W) -> Int32
-
-Add a weighted edge from vertex u to vertex v and return the edge index.
-
-**WeightedAdjGraph-specific**: O(1) amortized with type-safe weight storage.
-
-See [`add_edge!`](@ref) for the general interface documentation.
-"""
+# WeightedAdjGraph-specific: add_edge!(g::WeightedAdjGraph{W}, u::Integer, v::Integer, weight::W) -> Int32
+# O(1) amortized with weight storage; see GraphInterface.add_edge! for API docs.
 function add_edge!(g::WeightedAdjGraph{W}, u::Integer, v::Integer, weight::W) where W
     u32, v32 = Int32(u), Int32(v)
 
@@ -819,15 +790,8 @@ function add_edge!(g::WeightedAdjGraph{W}, u::Integer, v::Integer, weight::W) wh
     return new_edge_idx
 end
 
-"""
-    remove_vertex!(g::AdjGraph, v::Integer) -> Bool
-
-Remove vertex v and all its incident edges from the graph.
-
-**AdjGraph-specific**: O(V+E) operation requiring updates to all vertex references and array compaction.
-
-See [`remove_vertex!`](@ref) for the general interface documentation.
-"""
+# AdjGraph-specific: remove_vertex!(g::AdjGraph, v::Integer) -> Bool
+# O(V+E) update/compaction; see GraphInterface.remove_vertex! for API docs.
 function remove_vertex!(g::AdjGraph, v::Integer)
     v32 = Int32(v)
 
@@ -870,15 +834,8 @@ function remove_vertex!(g::AdjGraph, v::Integer)
     return true
 end
 
-"""
-    remove_vertex!(g::WeightedAdjGraph, v::Integer) -> Bool
-
-Remove vertex v and all its incident edges from the weighted graph.
-
-**WeightedAdjGraph-specific**: O(V+E) operation with weight array maintenance and vertex reference updates.
-
-See [`remove_vertex!`](@ref) for the general interface documentation.
-"""
+# WeightedAdjGraph-specific: remove_vertex!(g::WeightedAdjGraph, v::Integer) -> Bool
+# O(V+E) with weight maintenance; see GraphInterface.remove_vertex! for API docs.
 function remove_vertex!(g::WeightedAdjGraph, v::Integer)
     v32 = Int32(v)
 
@@ -921,15 +878,8 @@ function remove_vertex!(g::WeightedAdjGraph, v::Integer)
     return true
 end
 
-"""
-    remove_edge!(g::AdjGraph, u::Integer, v::Integer) -> Bool
-
-Remove the edge from vertex u to vertex v from the graph.
-
-**AdjGraph-specific**: O(degree) operation using linear search in neighbor lists.
-
-See [`remove_edge!`](@ref) for the general interface documentation.
-"""
+# AdjGraph-specific: remove_edge!(g::AdjGraph, u::Integer, v::Integer) -> Bool
+# O(degree) remove via linear search; see GraphInterface.remove_edge! for API docs.
 function remove_edge!(g::AdjGraph, u::Integer, v::Integer)
     u32, v32 = Int32(u), Int32(v)
 
@@ -978,15 +928,8 @@ function remove_edge!(g::AdjGraph, u::Integer, v::Integer)
     return true
 end
 
-"""
-    remove_edge!(g::WeightedAdjGraph, u::Integer, v::Integer) -> Bool
-
-Remove the weighted edge from vertex u to vertex v from the graph.
-
-**WeightedAdjGraph-specific**: O(degree) operation with weight array maintenance.
-
-See [`remove_edge!`](@ref) for the general interface documentation.
-"""
+# WeightedAdjGraph-specific: remove_edge!(g::WeightedAdjGraph, u::Integer, v::Integer) -> Bool
+# O(degree) remove with weight cleanup; see GraphInterface.remove_edge! for API docs.
 function remove_edge!(g::WeightedAdjGraph, u::Integer, v::Integer)
     u32, v32 = Int32(u), Int32(v)
 

@@ -1,7 +1,7 @@
 name = "GraphCore"
 uuid = "959eb29d-3b89-4f5f-bee6-61f8037ea4e1"
 authors = ["Jack Lidmar <jlidmar@kth.se>"]
-version = "0.4.3"
+version = "0.4.4"
 
 [deps]
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"

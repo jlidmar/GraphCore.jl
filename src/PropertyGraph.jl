@@ -224,30 +224,16 @@ end
 # GRAPH MUTATION (Available when base graph supports it)
 # ==============================================================================
 
-"""
-    add_vertex!(g::PropertyGraph{G,V,E}, vertex_prop::V) -> Int32
-
-Add a new vertex to the property graph with the specified property.
-Returns the index of the new vertex.
-
-Only available when the base graph type supports `add_vertex!`.
-"""
+# PropertyGraph-specific: add_vertex!(g::PropertyGraph{G,V,E}, vertex_prop::V) -> Int32
+# Delegates to core add_vertex! and appends the property; see GraphInterface.add_vertex! for API docs.
 function add_vertex!(g::PropertyGraph{G,V,E}, vertex_prop::V) where {G,V,E}
     new_vertex = add_vertex!(g.core)
     push!(g.vertex_properties, vertex_prop)
     return new_vertex
 end
 
-"""
-    add_edge!(g::PropertyGraph{G,V,E}, u::Integer, v::Integer, edge_prop::E) -> Int32
-
-Add an edge from vertex u to vertex v with an edge property and return the edge index.
-
-**PropertyGraph-specific**: Adds edge with type-safe property storage.
-Inherits base graph performance plus minimal property overhead.
-
-See [`add_edge!`](@ref) for the general interface documentation.
-"""
+# PropertyGraph-specific: add_edge!(g::PropertyGraph{G,V,E}, u::Integer, v::Integer, edge_prop::E) -> Int32
+# Delegates to core add_edge! and appends edge_prop; see GraphInterface.add_edge! for API docs.
 function add_edge!(g::PropertyGraph{G,V,E}, u::Integer, v::Integer, edge_prop::E) where {G,V,E}
     edge_idx = add_edge!(g.core, u, v)
     if edge_idx > 0
@@ -256,15 +242,8 @@ function add_edge!(g::PropertyGraph{G,V,E}, u::Integer, v::Integer, edge_prop::E
     return edge_idx
 end
 
-"""
-    add_edge!(g::PropertyGraph{<:WeightedGraphInterface,V,E}, u::Integer, v::Integer,
-              weight::W, edge_prop::E) -> Int32
-
-Add a weighted edge from u to v with the specified weight and edge property.
-Returns the edge index of the newly added edge, or 0 if edge already exists.
-
-Only available when the base graph type supports weighted `add_edge!`.
-"""
+# PropertyGraph-weighted: add_edge!(g::PropertyGraph{<:WeightedGraphInterface{W},V,E}, u::Integer, v::Integer, weight::W, edge_prop::E) -> Int32
+# Delegates to weighted core add_edge! and appends edge_prop; see GraphInterface.add_edge! for API docs.
 function add_edge!(g::PropertyGraph{<:WeightedGraphInterface{W},V,E}, u::Integer, v::Integer,
                    weight::W, edge_prop::E) where {W,V,E}
     edge_idx = add_edge!(g.core, u, v, weight)
@@ -274,16 +253,8 @@ function add_edge!(g::PropertyGraph{<:WeightedGraphInterface{W},V,E}, u::Integer
     return edge_idx
 end
 
-"""
-    remove_vertex!(g::PropertyGraph, v::Integer) -> Bool
-
-Remove vertex v and all its incident edges from the property graph.
-
-**PropertyGraph-specific**: Automatic property management with vertex renumbering.
-Inherits base graph performance characteristics.
-
-See [`remove_vertex!`](@ref) for the general interface documentation.
-"""
+# PropertyGraph-specific: remove_vertex!(g::PropertyGraph, v::Integer) -> Bool
+# Delegates to core remove_vertex! and synchronizes properties; see GraphInterface.remove_vertex! for API docs.
 function remove_vertex!(g::PropertyGraph, v::Integer)
     success = remove_vertex!(g.core, v)
     if success
@@ -303,16 +274,8 @@ function remove_vertex!(g::PropertyGraph, v::Integer)
     return success
 end
 
-"""
-    remove_edge!(g::PropertyGraph, u::Integer, v::Integer) -> Bool
-
-Remove the edge from vertex u to vertex v from the property graph.
-
-**PropertyGraph-specific**: Automatic property management with edge removal.
-Inherits base graph performance characteristics.
-
-See [`remove_edge!`](@ref) for the general interface documentation.
-"""
+# PropertyGraph-specific: remove_edge!(g::PropertyGraph, u::Integer, v::Integer) -> Bool
+# Delegates to core remove_edge! and synchronizes properties; see GraphInterface.remove_edge! for API docs.
 function remove_edge!(g::PropertyGraph, u::Integer, v::Integer)
     # Get the edge index before removal for property cleanup
     edge_idx = find_edge_index(g.core, u, v)
@@ -329,12 +292,8 @@ end
 # WEIGHT MUTATION (Available when base weighted graph supports it)
 # ==============================================================================
 
-"""
-    set_edge_weight!(g::PropertyGraph{<:WeightedGraphInterface}, directed_edge_idx::Integer, weight) -> Nothing
-
-Set the weight of the directed edge at directed_edge_idx to weight.
-Only available when the base graph type supports weight mutation.
-"""
+# PropertyGraph-specific: set_edge_weight!(g::PropertyGraph{<:WeightedGraphInterface}, directed_edge_idx::Integer, weight) -> Nothing
+# Delegates to core set_edge_weight!; see GraphInterface.set_edge_weight! for API docs.
 function set_edge_weight!(g::PropertyGraph{<:WeightedGraphInterface}, args...)
     return set_edge_weight!(g.core, args...)
 end

@@ -40,12 +40,8 @@ num_vertices(builder::GraphBuilder) = Int(builder.max_vertex)
 num_edges(builder::GraphBuilder) = length(builder.edges)
 is_directed_graph(builder::GraphBuilder) = builder.directed
 
-"""
-    add_vertex!(builder::GraphBuilder [, prop]) -> Int32
-
-Add a vertex with optional property. Returns the vertex index.
-For non-property builders, prop should be omitted.
-"""
+# GraphBuilder-specific: add_vertex!(builder::GraphBuilder [, prop]) -> Int32
+# Increment builder.max_vertex and optionally append a property; see GraphInterface.add_vertex! for API docs.
 function add_vertex!(builder::GraphBuilder{V,E,W}) where {V,E,W}
     builder.max_vertex += 1
     if V !== Nothing
@@ -61,28 +57,8 @@ function add_vertex!(builder::GraphBuilder{V,E,W}, prop::V) where {V,E,W}
     return builder.max_vertex
 end
 
-"""
-    add_edge!(builder::GraphBuilder, u::Integer, v::Integer;
-              edge_property=nothing, weight=nothing) -> Int32
-
-Add an edge with optional properties and weights using keyword arguments.
-Returns the edge index (1-based).
-
-# Examples
-```julia
-# Basic edge
-add_edge!(builder, 1, 2)
-
-# Weighted edge
-add_edge!(builder, 1, 2; weight=1.5)
-
-# Edge with property
-add_edge!(builder, 1, 2; edge_property="connection")
-
-# Both weight and property
-add_edge!(builder, 1, 2; edge_property="highway", weight=2.5)
-```
-"""
+# GraphBuilder-specific: add_edge!(builder::GraphBuilder, u::Integer, v::Integer; edge_property=nothing, weight=nothing) -> Int32
+# Adds an edge to the builder; stores optional property/weight. See GraphInterface.add_edge! for API docs.
 function add_edge!(builder::GraphBuilder{V,E,W}, u::Integer, v::Integer;
                    edge_property=nothing, weight=nothing) where {V,E,W}
     u32, v32 = Int32(u), Int32(v)
@@ -131,11 +107,8 @@ function add_edge!(builder::GraphBuilder{V,E,W}, u::Integer, v::Integer;
     return Int32(length(builder.edges))
 end
 
-"""
-    add_edge!(builder::GraphBuilder{Nothing,Nothing,Nothing}, u::Integer, v::Integer) -> Int32
-
-Convenience method for basic (unweighted, no properties) graph builders.
-"""
+# Convenience: add_edge!(builder::GraphBuilder{Nothing,Nothing,Nothing}, u::Integer, v::Integer) -> Int32
+# Unweighted, no-property convenience overload; see GraphInterface.add_edge! for API docs.
 function add_edge!(builder::GraphBuilder{Nothing,Nothing,Nothing}, u::Integer, v::Integer)
     return add_edge!(builder, u, v; edge_property=nothing, weight=nothing)
 end

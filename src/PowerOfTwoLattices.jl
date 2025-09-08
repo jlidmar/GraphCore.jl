@@ -370,21 +370,13 @@ end
 # DIRECTED EDGE INDEXING (SAME AS UNDIRECTED FOR LATTICES)
 # ==============================================================================
 
-"""
-    directed_edge_index(g::PowerOfTwoLattice{D}, v::Integer, i::Integer) -> Int32
-
-Get the i-th directed edge index from vertex v.
-For undirected lattices, this is the same as edge_index.
-"""
+# PowerOfTwoLattice-specific: directed_edge_index(g::PowerOfTwoLattice{D}, v::Integer, i::Integer) -> Int32
+# Same as edge_index for undirected lattices; see GraphInterface.directed_edge_index for API docs.
 @inline directed_edge_index(g::PowerOfTwoLattice{D}, v::Integer, i::Integer) where D =
     edge_index(g, v, i)
 
-"""
-    directed_edge_indices(g::PowerOfTwoLattice{D}, v::Integer) -> NTuple{2D,Int32}
-
-Get all directed edge indices from vertex v.
-For undirected lattices, this is the same as edge_indices.
-"""
+# PowerOfTwoLattice-specific: directed_edge_indices(g::PowerOfTwoLattice{D}, v::Integer) -> NTuple{2D,Int32}
+# Same as edge_indices for undirected lattices; see GraphInterface.directed_edge_indices for API docs.
 @inline directed_edge_indices(g::PowerOfTwoLattice{D}, v::Integer) where D =
     edge_indices(g, v)
 
@@ -392,12 +384,8 @@ For undirected lattices, this is the same as edge_indices.
 # ENHANCED EDGE LOOKUP
 # ==============================================================================
 
-"""
-    find_edge_index(g::PowerOfTwoLattice{D}, u::Integer, v::Integer) -> Int32
-
-Find the edge index for edge (u,v).
-Uses the smaller vertex as the base and computes which local edge it is.
-"""
+# PowerOfTwoLattice-specific: find_edge_index(g::PowerOfTwoLattice{D}, u::Integer, v::Integer) -> Int32
+# Compute edge index deterministically; see GraphInterface.find_edge_index for API docs.
 @inline function find_edge_index(g::PowerOfTwoLattice{D}, u::Integer, v::Integer) where D
     if !has_edge(g, u, v)
         return Int32(0)

@@ -697,15 +697,8 @@ build_weighted_graph(edges, weights::AbstractVector{W}; directed::Bool=true, kwa
 # MUTATION METHODS FOR COREGRAPH (convenience - not efficient!)
 # ==============================================================================
 
-"""
-    add_vertex!(g::CoreGraph) -> Int32
-
-Add a new isolated vertex to the graph and return its index.
-
-**CoreGraph-specific**: O(1) operation extending vertex_offsets array.
-
-See [`add_vertex!`](@ref) for the general interface documentation.
-"""
+# CoreGraph-specific: add_vertex!(g::CoreGraph) -> Int32
+# O(1) append of an isolated vertex; see GraphInterface.add_vertex! for API docs.
 function add_vertex!(g::CoreGraph{D}) where D
     # Simply extend vertex_offsets with the same offset as the last vertex
     # This creates an isolated vertex with no neighbors
@@ -715,16 +708,8 @@ function add_vertex!(g::CoreGraph{D}) where D
     return Int32(num_vertices(g))
 end
 
-"""
-    add_edge!(g::CoreGraph, u::Integer, v::Integer) -> Int32
-
-Add an edge from vertex u to vertex v and return the edge index.
-
-**CoreGraph-specific**: O(degree) operation that extends CSR arrays and updates vertex offsets.
-Most efficient for graphs that are mostly static after construction.
-
-See [`add_edge!`](@ref) for the general interface documentation.
-"""
+# CoreGraph-specific: add_edge!(g::CoreGraph, u::Integer, v::Integer) -> Int32
+# O(degree) operation that updates CSR arrays; see GraphInterface.add_edge! for API docs.
 function add_edge!(g::CoreGraph{D}, u::Integer, v::Integer) where D
     # Validate vertices exist
     if !has_vertex(g, u) || !has_vertex(g, v)
@@ -793,15 +778,8 @@ function _add_directed_edge!(g::CoreGraph{D}, u::Integer, v::Integer, edge_idx=n
     end
 end
 
-"""
-    remove_vertex!(g::CoreGraph, v::Integer) -> Bool
-
-Remove vertex v and all its incident edges from the graph.
-
-**CoreGraph-specific**: O(V+E) operation requiring CSR array rebuilding and vertex renumbering.
-
-See [`remove_vertex!`](@ref) for the general interface documentation.
-"""
+# CoreGraph-specific: remove_vertex!(g::CoreGraph, v::Integer) -> Bool
+# O(V+E) rebuild/renumber; see GraphInterface.remove_vertex! for API docs.
 function remove_vertex!(g::CoreGraph{D}, v::Integer) where D
     if !has_vertex(g, v)
         return false
@@ -896,15 +874,8 @@ function remove_vertex!(g::CoreGraph{D}, v::Integer) where D
     return true
 end
 
-"""
-    remove_edge!(g::CoreGraph, u::Integer, v::Integer) -> Bool
-
-Remove the edge from vertex u to vertex v from the graph.
-
-**CoreGraph-specific**: O(degree) operation removing entries from CSR arrays and updating offsets.
-
-See [`remove_edge!`](@ref) for the general interface documentation.
-"""
+# CoreGraph-specific: remove_edge!(g::CoreGraph, u::Integer, v::Integer) -> Bool
+# O(degree) remove from CSR arrays; see GraphInterface.remove_edge! for API docs.
 function remove_edge!(g::CoreGraph{D}, u::Integer, v::Integer) where D
     # Validate vertices exist
     if !has_vertex(g, u) || !has_vertex(g, v)
@@ -972,13 +943,8 @@ end
 # MUTATION METHODS FOR WEIGHTEDGRAPH (convenience - not efficient!)
 # ==============================================================================
 
-"""
-    add_vertex!(g::WeightedGraph) -> Int32
-
-Add a new isolated vertex to the weighted graph and return its index.
-
-**Efficient Implementation**: O(1) operation that simply extends the vertex_offsets array.
-"""
+# WeightedGraph-specific: add_vertex!(g::WeightedGraph) -> Int32
+# O(1) append of an isolated vertex; see GraphInterface.add_vertex! for API docs.
 function add_vertex!(g::WeightedGraph{W,D}) where {W,D}
     # Simply extend vertex_offsets with the same offset as the last vertex
     # This creates an isolated vertex with no neighbors
@@ -988,16 +954,8 @@ function add_vertex!(g::WeightedGraph{W,D}) where {W,D}
     return Int32(num_vertices(g))
 end
 
-"""
-    add_edge!(g::WeightedGraph{W}, u::Integer, v::Integer, weight::W) -> Int32
-
-Add a weighted edge from vertex u to vertex v and return the edge index.
-
-**WeightedGraph-specific**: Adds edge with type-safe weight storage.
-Weight type `W` must match the graph's weight type.
-
-See [`add_edge!`](@ref) for the general interface documentation.
-"""
+# WeightedGraph-specific: add_edge!(g::WeightedGraph{W}, u::Integer, v::Integer, weight::W) -> Int32
+# Adds edge with type-safe weight storage; see GraphInterface.add_edge! for API docs.
 function add_edge!(g::WeightedGraph{W,D}, u::Integer, v::Integer, weight::W) where {W,D}
     # Validate vertices exist
     if !has_vertex(g, u) || !has_vertex(g, v)
@@ -1064,15 +1022,8 @@ function _add_directed_weighted_edge!(g::WeightedGraph{W,D}, u::Integer, v::Inte
     end
 end
 
-"""
-    remove_vertex!(g::WeightedGraph, v::Integer) -> Bool
-
-Remove vertex v and all its incident edges from the weighted graph.
-
-**WeightedGraph-specific**: O(V+E) operation with CSR rebuilding and weight array maintenance.
-
-See [`remove_vertex!`](@ref) for the general interface documentation.
-"""
+# WeightedGraph-specific: remove_vertex!(g::WeightedGraph, v::Integer) -> Bool
+# O(V+E) rebuild with weight maintenance; see GraphInterface.remove_vertex! for API docs.
 function remove_vertex!(g::WeightedGraph{W,D}, v::Integer) where {W,D}
     if !has_vertex(g, v)
         return false
@@ -1170,15 +1121,8 @@ function remove_vertex!(g::WeightedGraph{W,D}, v::Integer) where {W,D}
     return true
 end
 
-"""
-    remove_edge!(g::WeightedGraph, u::Integer, v::Integer) -> Bool
-
-Remove the edge from vertex u to vertex v from the weighted graph.
-
-**WeightedGraph-specific**: O(degree) operation removing CSR entries and weight data.
-
-See [`remove_edge!`](@ref) for the general interface documentation.
-"""
+# WeightedGraph-specific: remove_edge!(g::WeightedGraph, u::Integer, v::Integer) -> Bool
+# O(degree) remove with weight cleanup; see GraphInterface.remove_edge! for API docs.
 function remove_edge!(g::WeightedGraph{W,D}, u::Integer, v::Integer) where {W,D}
     # Validate vertices exist
     if !has_vertex(g, u) || !has_vertex(g, v)
