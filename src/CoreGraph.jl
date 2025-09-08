@@ -440,12 +440,21 @@ Preserves the directedness of the original graph.
 """
 function to_core_graph(g::GraphInterface)
     vertex_offsets = Int32[1; accumulate(+, degree(g, v) for v in vertices(g); init=one(Int32))]
-    neighbors = reduce(vcat, [neighbor_indices(g, v) for v in vertices(g)])  # Array, not generator!
+    neighbors = _flatten_vv([neighbor_indices(g, v) for v in vertices(g)])  # Efficiently flatten
     if is_directed_graph(g)
         return CoreGraph{true}(vertex_offsets, neighbors, num_edges(g))
     else
-        neighbor_to_edge = reduce(vcat, [edge_indices(g, v) for v in vertices(g)])  # Array, not generator!
+        neighbor_to_edge = _flatten_vv([edge_indices(g, v) for v in vertices(g)])  # Efficiently flatten
         return CoreGraph{false}(vertex_offsets, neighbors, neighbor_to_edge, num_edges(g))
+    end
+end
+
+# Helper function to flatten vector of views or iterators efficiently
+function _flatten_vv(vv::AbstractVector)
+    if vv isa AbstractVector{<:AbstractVector} # If already vectors, use vcat
+        return reduce(vcat, vv)
+    else
+        return collect(Iterators.flatten(vv))  # Flatten into single array
     end
 end
 
@@ -460,13 +469,13 @@ function to_weighted_graph(g::WeightedGraphInterface{W}) where W
     vertex_offsets = Int32[1; accumulate(+, degree(g, v) for v in vertices(g); init=one(Int32))]
 
     # Build neighbors and weights arrays using reduce
-    neighbors = reduce(vcat, [neighbor_indices(g, v) for v in vertices(g)])
-    weights = reduce(vcat, [edge_weights(g, v) for v in vertices(g)])
+    neighbors = _flatten_vv([neighbor_indices(g, v) for v in vertices(g)])
+    weights = _flatten_vv([edge_weights(g, v) for v in vertices(g)])
 
     if is_directed_graph(g)
         return WeightedGraph{W,true}(vertex_offsets, neighbors, weights, num_edges(g))
     else
-        neighbor_to_edge = reduce(vcat, [edge_indices(g, v) for v in vertices(g)])
+        neighbor_to_edge = _flatten_vv([edge_indices(g, v) for v in vertices(g)])
         return WeightedGraph{W,false}(vertex_offsets, neighbors, weights, neighbor_to_edge, num_edges(g))
     end
 end

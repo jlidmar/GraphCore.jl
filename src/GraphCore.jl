@@ -20,6 +20,7 @@ module GraphCore
 export GraphInterface, WeightedGraphInterface, PropertyGraphInterface
 export CoreGraph, WeightedGraph, PropertyGraph
 export AdjGraph, WeightedAdjGraph, PropertyAdjGraph
+public EdgeIterator
 
 # ==============================================================================
 # GRAPH CONSTRUCTION (Primary API)
@@ -42,7 +43,7 @@ export find_edge_index, find_directed_edge_index
 # ==============================================================================
 export edge_weight, edge_weights, neighbor_weights
 export vertex_property, edge_property
-export set_vertex_property!, set_edge_property!
+export set_vertex_property!, set_edge_property!, set_edge_weight!
 export vertex_properties, edge_properties
 
 # ==============================================================================
@@ -59,6 +60,7 @@ include("utils.jl")
 
 # Make utility functions public but not exported
 public canonicalize_edges, symmetrize_edges
+public validate_interface, interface_summary
 
 # ==============================================================================
 # SUBMODULES
@@ -75,15 +77,14 @@ include("Conversions.jl")
 using .Conversions
 export from_graphs_jl, from_weighted_graphs_jl
 # Re-export commonly used conversions
-export to_adj_graph, to_core_graph, to_weighted_graph, to_weighted_adj_graph
+export to_adj_graph, to_core_graph, to_weighted_graph, to_weighted_adj_graph, to_property_graph
 
 # Other graph types
 include("Lattices.jl")
 include("PowerOfTwoLattices.jl")
 using .Lattices, .PowerOfTwoLattices
-export HypercubicLattice, Grid2D, Grid3D, Chain1D
-export PowerOfTwoLattice, P2Grid2D, P2Grid3D, P2Chain1D
-export lattice_size, lattice_dimension, coord_to_vertex, vertex_to_coord
-export lattice_neighbors, lattice_distance
+export Lattices, PowerOfTwoLattices
+export HypercubicLattice
+export PowerOfTwoLattice
 
 end # module GraphCore

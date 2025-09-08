@@ -12,12 +12,15 @@ Restrictions:
 """
 module PowerOfTwoLattices
 
-import ..GraphCore: GraphInterface, num_vertices, num_edges, has_edge, neighbor_indices
+import ..GraphCore: GraphInterface, num_vertices, num_edges, num_directed_edges, has_vertex, has_edge, degree
+import ..GraphCore: neighbor_indices, edge_indices, directed_edge_indices, neighbor, edge_index, directed_edge_index
 import ..GraphCore: is_directed_graph, find_edge_index, find_directed_edge_index
 
 export PowerOfTwoLattice
 export P2Grid2D, P2Grid3D, P2Chain1D
 export lattice_size, lattice_dimension
+export lattice_neighbors, lattice_distance
+public coord_to_vertex, vertex_to_coord
 
 # ==============================================================================
 # POWER-OF-TWO LATTICE STRUCTURE

@@ -1,6 +1,9 @@
 # Changelog
 
-## [0.4.2]
+## [0.4.3]
+
+### Changed
+- **Conversion functions**: Improve `to_core_graph`, etc.
 - **Documentation Improvements**: Streamlined and centralized function docstrings for better maintainability
 
 ## [0.4.0]
@@ -56,7 +59,7 @@
 - **Graphs.jl Compatibility**: Drop-in replacement for most Graphs.jl functionality
 - **Unified Interface**: All graph types work with the same functions and syntax
 
-[0.4.2]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.4.2
+[0.4.3]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.4.3
 [0.4.0]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.4.0
 
 All notable changes to this project will be documented in this file.
