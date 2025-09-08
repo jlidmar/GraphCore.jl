@@ -4,7 +4,7 @@
 
 ```@autodocs
 Modules = [GraphCore]
-Order   = [:type, :function]
+Order   = [:module, :type, :function]
 Private = false
 ```
 
@@ -12,7 +12,7 @@ Private = false
 
 ```@autodocs
 Modules = [GraphCore.Builders]
-Order   = [:type, :function]
+Order   = [:module, :type, :function]
 Private = false
 ```
 
@@ -20,7 +20,7 @@ Private = false
 
 ```@autodocs
 Modules = [GraphCore.Conversions]
-Order   = [:type, :function]
+Order   = [:module, :type, :function]
 Private = false
 ```
 
@@ -28,6 +28,6 @@ Private = false
 
 ```@autodocs
 Modules = [GraphCore.Lattices, GraphCore.PowerOfTwoLattices]
-Order   = [:type, :function]
+Order   = [:module, :type, :function]
 Private = false
 ```
