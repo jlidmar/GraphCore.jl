@@ -126,8 +126,8 @@ num_vertices(g::HypercubicLattice) = g.total_vertices
 """Number of edges in the lattice."""
 num_edges(g::HypercubicLattice) = g.total_edges
 
-"""Number of directed edges (same as undirected for lattices)."""
-num_directed_edges(g::HypercubicLattice) = g.total_edges
+"""Number of directed edges (twice the number of undirected for lattices)."""
+num_directed_edges(g::HypercubicLattice) = 2 * g.total_edges
 
 """Lattices are always undirected."""
 is_directed_graph(g::HypercubicLattice) = false

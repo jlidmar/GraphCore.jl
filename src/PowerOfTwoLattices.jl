@@ -99,7 +99,7 @@ P2Grid3D(log_width::Integer, log_height::Integer, log_depth::Integer) =
 
 num_vertices(g::PowerOfTwoLattice) = g.total_vertices
 num_edges(g::PowerOfTwoLattice) = g.total_edges
-num_directed_edges(g::PowerOfTwoLattice) = g.total_edges
+num_directed_edges(g::PowerOfTwoLattice) = 2 * g.total_edges
 is_directed_graph(g::PowerOfTwoLattice) = false
 
 @inline has_vertex(g::PowerOfTwoLattice, v::Integer) = 1 ≤ v ≤ g.total_vertices
