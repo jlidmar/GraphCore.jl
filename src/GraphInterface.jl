@@ -71,10 +71,15 @@ Interface for weighted graphs, extending the core graph interface.
 abstract type WeightedGraphInterface{W} <: GraphInterface end
 
 """
-    PropertyGraphInterface{V,E,W} <: GraphInterface
+    PropertyGraphInterface{G,V,E} <: GraphInterface
     Abstract interface for property graphs, which support vertex and edge properties.
+    
+    # Type Parameters
+    - `G<:GraphInterface`: Base graph type (CoreGraph, WeightedGraph, AdjGraph, etc.)  
+    - `V`: Vertex property type
+    - `E`: Edge property type
 """
-abstract type PropertyGraphInterface{V,E} <: GraphInterface end
+abstract type PropertyGraphInterface{G,V,E} <: GraphInterface where G<:GraphInterface end
 
 # Core interface methods
 
@@ -160,6 +165,35 @@ Return true if the graph is directed, false if undirected.
 This affects the interpretation of edges and neighbor relationships.
 """
 function is_directed_graph end
+
+"""
+    is_weighted_graph(g::GraphInterface) -> Bool
+
+Return true if the graph has explicit edge weights, false if unweighted.
+
+This function allows algorithms to choose between weighted and unweighted implementations:
+- **Weighted graphs**: Use actual edge weights for computations
+- **Unweighted graphs**: Can use more efficient algorithms (e.g., BFS instead of Dijkstra)
+
+Note that unweighted graphs still support `edge_weight`/`edge_weights` functions
+(returning 1), but `is_weighted_graph` distinguishes between explicit and implicit weights.
+
+# Examples
+```julia
+if is_weighted_graph(g)
+    result = dijkstra_shortest_paths(g, source)  # Use weights
+else
+    result = bfs_shortest_paths(g, source)       # More efficient for unweighted
+end
+
+# Alternative: type-based dispatch for performance-critical code
+g isa WeightedGraphInterface{Float64}  # Specific weight type
+g isa WeightedGraphInterface           # Any weighted graph
+```
+
+See also: [`WeightedGraphInterface`](@ref), [`edge_weight`](@ref), [`edge_weights`](@ref)
+"""
+function is_weighted_graph end
 
 # ==============================================================================
 # EXTENDED CORE INTERFACE (additional commonly needed methods)
@@ -266,10 +300,13 @@ function directed_edge_indices end
 # ==============================================================================
 
 """
-    edge_weights(g::WeightedGraphInterface, v::Integer) -> view or iterator
-    edge_weights(g::WeightedGraphInterface) -> view or iterator
+    edge_weights(g::GraphInterface, v::Integer) -> view or iterator
+    edge_weights(g::GraphInterface) -> view or iterator
 
 Return weights for edges from vertex v, or all edge weights.
+
+**For weighted graphs**: Returns actual edge weights stored in the graph.
+**For unweighted graphs**: Returns an iterator of 1s (mathematical consistency).
 
 **Important**: Weights are **always directional**, even for undirected graphs.
 This design allows asymmetric weights (e.g., different traversal costs in each direction).
@@ -278,9 +315,9 @@ This design allows asymmetric weights (e.g., different traversal costs in each d
 
 # Examples
 ```julia
-# Process neighbors with weights
+# Process neighbors with weights. Works for both weighted and unweighted graphs
 for (neighbor, weight) in zip(neighbor_indices(g, v), edge_weights(g, v))
-    process_weighted_edge(v, neighbor, weight)
+    process_weighted_edge(v, neighbor, weight)  # weight = 1 for unweighted
 end
 
 # More convenient combined iteration
@@ -288,29 +325,48 @@ for (neighbor, weight) in neighbor_weights(g, v)
     process_weighted_edge(v, neighbor, weight)
 end
 ```
+
+# Algorithm Selection
+For performance-critical algorithms, use `is_weighted_graph(g)` to choose optimal implementation:
+```julia
+if is_weighted_graph(g)
+    dijkstra_shortest_paths(g, source)  # Use actual weights
+else
+    bfs_shortest_paths(g, source)       # More efficient for unweighted
+end
+```
 """
 function edge_weights end
 
 """
-    edge_weight(g::WeightedGraphInterface, directed_edge_idx::Integer) -> W
-    edge_weight(g::WeightedGraphInterface, edge::Pair{<:Integer,<:Integer}) -> W
+    edge_weight(g::GraphInterface, directed_edge_idx::Integer) -> W
+    edge_weight(g::GraphInterface, edge::Pair{<:Integer,<:Integer}) -> W
 
 Get the weight of the directed edge at the given directed edge index.
+
+**For weighted graphs**: Returns the actual stored weight.
+**For unweighted graphs**: Returns 1 (Int32) for mathematical consistency.
+
 Uses the directional indexing system for O(1) weight lookups.
-The second form allows querying by vertex pair, equivalent to `edge_weight(g, find_edge_index(g, u, v))`.
+The second form allows querying by vertex pair, equivalent to `edge_weight(g, find_directed_edge_index(g, u, v))`.
 """
 function edge_weight end
 
 """
-    neighbor_weights(g::WeightedGraphInterface, v::Integer) -> iterator
+    neighbor_weights(g::GraphInterface, v::Integer) -> iterator
 
 Return an iterator over `(neighbor_index, weight)` pairs for vertex v.
+
+**For weighted graphs**: Returns actual edge weights stored in the graph.
+**For unweighted graphs**: Returns weight 1 for all edges (mathematical consistency).
+
 More efficient than separate iteration over `neighbor_indices(g, v)` and `edge_weights(g, v)`.
 
 Usage:
 ```julia
     for (neighbor, weight) in neighbor_weights(g, v)
         # process neighbor and weight together
+        # weight = 1 for unweighted graphs
     end
 ```
 See also: [`neighbor_indices`](@ref), [`edge_weights`](@ref)
@@ -338,7 +394,7 @@ Uses undirected edge indexing (1:num_edges).
 function edge_property end
 
 """
-    set_vertex_property!(g::PropertyGraphInterface{V,E,W}, v::Integer, prop::V) -> prop
+    set_vertex_property!(g::PropertyGraphInterface{G,V,E}, v::Integer, prop::V) -> prop
 
 Set the property of vertex v to prop.
 Only available for mutable graph types.
@@ -346,7 +402,7 @@ Only available for mutable graph types.
 function set_vertex_property! end
 
 """
-    set_edge_property!(g::PropertyGraphInterface{V,E,W}, edge_idx::Integer, prop::E) -> prop
+    set_edge_property!(g::PropertyGraphInterface{G,V,E}, edge_idx::Integer, prop::E) -> prop
 
 Set the property of edge at edge_idx to prop.
 Only available for mutable graph types.
@@ -425,10 +481,12 @@ Return an iterator over all edge properties in edge index order.
 function edge_properties end
 
 """
-    set_edge_weight!(g::PropertyGraphInterface{V,E,W}, directed_edge_idx::Integer, weight::W) -> Nothing
+    set_edge_weight!(g::WeightedGraphInterface{W}, directed_edge_idx::Integer, weight::W) -> weight
+    set_edge_weight!(g::WeightedGraphInterface{W}, v::Integer, k::Integer, weight::W) -> weight
 
 Set the weight of the directed edge at directed_edge_idx to weight.
-Only available for mutable graph types.
+The second form sets the weight of the edge from vertex v to its k-th neighbor.
+Only available for graph types with weighted base graphs.
 """
 function set_edge_weight! end
 
@@ -847,6 +905,16 @@ end
 # DEFAULT IMPLEMENTATIONS
 # ==============================================================================
 
+# Default implementations for unweighted graphs
+@inline is_weighted_graph(::GraphInterface) = false
+@inline is_weighted_graph(::WeightedGraphInterface) = true
+
+# Default edge weight methods for unweighted graphs (excludes WeightedGraphInterface)
+@inline edge_weight(g::GraphInterface, ::Integer) = one(Int32)
+@inline edge_weights(g::GraphInterface, v::Integer) = Iterators.repeated(one(Int32), degree(g, v))
+@inline edge_weights(g::GraphInterface) = Iterators.repeated(one(Int32), num_directed_edges(g))
+
+# Default implementations for weighted graphs (may be overridden for efficiency)
 @inline Base.@propagate_inbounds function edge_weight(g::WeightedGraphInterface, v::Integer, i::Integer)
     return edge_weights(g, v)[i]
 end
@@ -859,8 +927,16 @@ end
     return @inbounds edge_weight(g, directed_idx)
 end
 
-@inline Base.@propagate_inbounds function neighbor_weights(g::WeightedGraphInterface, v::Integer)
+@inline Base.@propagate_inbounds function neighbor_weights(g::GraphInterface, v::Integer)
     return Iterators.zip(neighbor_indices(g, v), edge_weights(g, v))
+end
+
+@inline Base.@propagate_inbounds function set_edge_weight!(g::WeightedGraphInterface{W}, directed_edge_idx::Integer, weight::W) where {W<:Number}
+    return edge_weights(g)[directed_edge_idx] = weight
+end
+
+@inline Base.@propagate_inbounds function set_edge_weight!(g::WeightedGraphInterface{W}, v::Integer, k::Integer, weight::W) where {W<:Number}
+    return edge_weights(g,v)[k] = weight
 end
 
 # ==============================================================================
@@ -1026,12 +1102,18 @@ function interface_summary()
     - directed_edge_index(g, v, i) -> Int32
     - edge_indices(g, v) -> view or iterator
     - directed_edge_indices(g, v) -> view or iterator
+    - is_weighted_graph(g) -> Bool
 
-    WEIGHTED GRAPH INTERFACE:
+    EDGE WEIGHT INTERFACE (All Graphs):
     - edge_weights(g, v) -> view or iterator
     - edge_weights(g) -> view or iterator
     - edge_weight(g, directed_edge_idx) -> W
     - neighbor_weights(g, v) -> iterator
+
+    WEIGHTED GRAPH INTERFACE (Specialized):
+    - set_edge_weight!(g, directed_edge_idx, weight) -> weight
+    - set_edge_weight!(g, v, k, weight) -> weight
+    - Additional optimized implementations of above functions
 
     PROPERTY GRAPH INTERFACE:
     - vertex_property(g, v) -> V

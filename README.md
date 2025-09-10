@@ -37,6 +37,15 @@ add_vertex!(g)               # Add isolated vertex
 add_edge!(g, 1, 4)           # Add new edge
 remove_edge!(g, 2, 3)        # Remove existing edge
 
+# Unified edge weight interface (works for all graph types!)
+edge_weight(g, 1)            # Returns 1 for unweighted graphs
+edge_weight(wg, 1)           # Returns actual weight for weighted graphs
+
+# Generic algorithm support - works on both weighted and unweighted graphs
+for (neighbor, weight) in neighbor_weights(g, 1)
+    println("Edge to $neighbor has weight $weight")  # weight = 1 for unweighted
+end
+
 # Inspect edge iterators
 println(edges(g))            # Shows: "EdgeIterator over 3 edges from CoreGraph (undirected): (1,2), (1,3), (1,4)"
 

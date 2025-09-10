@@ -32,7 +32,7 @@ export build_adj_graph, build_weighted_adj_graph, build_property_adj_graph
 # BASIC GRAPH QUERIES
 # ==============================================================================
 export num_vertices, num_edges, num_directed_edges, is_directed_graph
-export has_vertex, has_edge, degree
+export has_vertex, has_edge, degree, is_weighted_graph
 export vertices, edges, all_edges, all_directed_edges, neighbor, neighbor_indices
 export edge_indices, directed_edge_indices
 export edge_index, directed_edge_index

@@ -180,6 +180,36 @@ for v in vertices(g)
 end
 ```
 
+### Unified Edge Weight Interface
+
+GraphCore provides a **unified interface** for edge weights that works seamlessly with both weighted and unweighted graphs:
+
+```julia
+# Works on ANY graph type!
+unweighted_g = build_core_graph([(1,2), (1,3)]; directed=false)
+weighted_g = build_weighted_graph([(1,2), (1,3)], [1.5, 2.0]; directed=false)
+
+# edge_weight() returns 1 for unweighted graphs, actual weight for weighted graphs
+println(edge_weight(unweighted_g, 1))  # → 1 (Int32)
+println(edge_weight(weighted_g, 1))    # → 1.5 (Float64)
+
+# neighbor_weights() works universally - perfect for generic algorithms!
+for (neighbor, weight) in neighbor_weights(unweighted_g, 1)
+    println("Edge to $neighbor has weight $weight")  # weight = 1 for unweighted
+end
+
+for (neighbor, weight) in neighbor_weights(weighted_g, 1)
+    println("Edge to $neighbor has weight $weight")  # actual weights
+end
+
+# Runtime detection for algorithm optimization
+if is_weighted_graph(g)
+    dijkstra_shortest_paths(g, source)  # Use actual weights
+else
+    bfs_shortest_paths(g, source)       # More efficient for unweighted
+end
+```
+
 ### Graph Modification
 
 **Adding elements:**

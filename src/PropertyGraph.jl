@@ -22,7 +22,7 @@ underlying graph type supports them.
 # ==============================================================================
 
 """
-    PropertyGraph{G,V,E} <: PropertyGraphInterface{V,E}
+    PropertyGraph{G,V,E} <: PropertyGraphInterface{G,V,E}
 
 Universal property graph that wraps any base graph type with typed vertex and edge properties.
 
@@ -87,7 +87,7 @@ edge_idx = add_edge!(adj_pg, u, v, edge_prop)
 - **Property management**: Automatic with minimal overhead
 - **Memory**: Base graph memory + property arrays + small wrapper overhead
 """
-struct PropertyGraph{G<:GraphInterface,V,E} <: PropertyGraphInterface{V,E}
+struct PropertyGraph{G<:GraphInterface,V,E} <: PropertyGraphInterface{G,V,E}
     core::G                           # Base graph
     vertex_properties::Vector{V}      # Properties for each vertex
     edge_properties::Vector{E}        # Properties for each undirected edge
@@ -189,13 +189,22 @@ end
 @inline Base.@propagate_inbounds find_directed_edge_index(g::PropertyGraph, u::Integer, v::Integer) = find_directed_edge_index(g.core, u, v)
 
 # ==============================================================================
-# WEIGHT DELEGATION (Weighted graph types only)
+# WEIGHT DELEGATION
 # ==============================================================================
 
-# Weight methods (only for weighted cores)
-@inline Base.@propagate_inbounds edge_weights(g::PropertyGraph{<:WeightedGraphInterface}, v::Integer) = edge_weights(g.core, v)
-@inline Base.@propagate_inbounds neighbor_weights(g::PropertyGraph{<:WeightedGraphInterface}, v::Integer) = neighbor_weights(g.core, v)
-@inline Base.@propagate_inbounds edge_weight(g::PropertyGraph{<:WeightedGraphInterface}, args...) = edge_weight(g.core, args...)
+# For weighted PropertyGraphs (base graph is a WeightedGraphInterface) - more specific, takes precedence
+@inline edge_weight(g::PropertyGraph{G,V,E}, directed_edge_idx::Integer) where {G<:GraphInterface,V,E} = edge_weight(g.core, directed_edge_idx)
+@inline edge_weights(g::PropertyGraph{G,V,E}, v::Integer) where {G<:GraphInterface,V,E} = edge_weights(g.core, v)
+@inline edge_weights(g::PropertyGraph{G,V,E}) where {G<:GraphInterface,V,E} = edge_weights(g.core)
+@inline Base.@propagate_inbounds function neighbor_weights(g::PropertyGraph{G,V,E}, v::Integer) where {G<:GraphInterface,V,E}
+    return neighbor_weights(g.core, v)
+end
+
+# Weight mutation (Available when base weighted graph supports it)
+# Delegates to core set_edge_weight!; see GraphInterface.set_edge_weight! for API docs.
+@inline Base.@propagate_inbounds function set_edge_weight!(g::PropertyGraph{G,V,E}, args...) where {G<:WeightedGraphInterface,V,E}
+    return set_edge_weight!(g.core, args...)
+end
 
 # ==============================================================================
 # PROPERTY ACCESS AND MUTATION
@@ -289,16 +298,6 @@ function remove_edge!(g::PropertyGraph, u::Integer, v::Integer)
 end
 
 # ==============================================================================
-# WEIGHT MUTATION (Available when base weighted graph supports it)
-# ==============================================================================
-
-# PropertyGraph-specific: set_edge_weight!(g::PropertyGraph{<:WeightedGraphInterface}, directed_edge_idx::Integer, weight) -> Nothing
-# Delegates to core set_edge_weight!; see GraphInterface.set_edge_weight! for API docs.
-function set_edge_weight!(g::PropertyGraph{<:WeightedGraphInterface}, args...)
-    return set_edge_weight!(g.core, args...)
-end
-
-# ==============================================================================
 # DISPLAY METHODS
 # ==============================================================================
 
@@ -322,12 +321,12 @@ function to_property_graph(g::GraphInterface, vertex_props::Vector{V}, edge_prop
 end
 
 """
-    to_property_graph(g::PropertyGraphInterface{V,E}) -> PropertyGraph{CoreGraph,V,E}
+    to_property_graph(g::PropertyGraphInterface{G,V,E}) -> PropertyGraph{CoreGraph,V,E}
 
 Convert any PropertyGraphInterface to a PropertyGraph wrapping a CoreGraph.
 Preserves directedness, vertex properties, and edge properties.
 """
-function to_property_graph(g::PropertyGraphInterface{V,E}) where {V,E}
+function to_property_graph(g::PropertyGraphInterface{G,V,E}) where {G,V,E}
     edge_list = edges(g)
     nv = num_vertices(g)
     vertex_props = collect(vertex_properties(g))
@@ -338,12 +337,12 @@ function to_property_graph(g::PropertyGraphInterface{V,E}) where {V,E}
 end
 
 """
-    to_property_graph(g::PropertyGraphInterface{V,E}, ::Type{AdjGraph}) -> PropertyGraph{AdjGraph,V,E}
+    to_property_graph(g::PropertyGraphInterface{G,V,E}, ::Type{AdjGraph}) -> PropertyGraph{AdjGraph,V,E}
 
 Convert any PropertyGraphInterface to a PropertyGraph backed by AdjGraph.
 Preserves directedness and all properties.
 """
-function to_property_graph(g::PropertyGraphInterface{V,E}, ::Type{AdjGraph}) where {V,E}
+function to_property_graph(g::PropertyGraphInterface{G,V,E}, ::Type{AdjGraph}) where {G,V,E}
     core = to_adj_graph(g)
     vertex_props = collect(vertex_properties(g))
     edge_props = collect(edge_properties(g))

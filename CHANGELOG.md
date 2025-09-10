@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0]
+
+### Added
+- **Unified Edge Weight Interface**: Major API enhancement for generic algorithm development
+  - `edge_weight()` and `edge_weights()` now work on ALL graph types (returns 1 for unweighted graphs)
+  - `neighbor_weights()` provides universal iteration over `(neighbor, weight)` pairs
+  - `is_weighted_graph()` enables runtime type detection for algorithm optimization
+  - **Breaking change**: `PropertyGraphInterface{G,V,E}` now parameterized with base graph type for cleaner dispatch
+
 ## [0.4.4]
 
 ### Changed
@@ -59,7 +68,8 @@
 - **Graphs.jl Compatibility**: Drop-in replacement for most Graphs.jl functionality
 - **Unified Interface**: All graph types work with the same functions and syntax
 
-[0.4.4]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.4.3
+[0.5.0]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.5.0
+[0.4.4]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.4.4
 
 All notable changes to this project will be documented in this file.
 
