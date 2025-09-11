@@ -443,6 +443,11 @@ function edge_weight(g::WeightedAdjGraph, directed_edge_idx::Integer)
     throw(BoundsError(g, directed_edge_idx))
 end
 
+# Direct weight access via vertex-neighbor indexing  
+@inline Base.@propagate_inbounds function edge_weight(g::WeightedAdjGraph, v::Integer, i::Integer)
+    return g.weights[v][i]
+end
+
 # ==============================================================================
 # TYPE UNIONS FOR CONSTRUCTION
 # ==============================================================================

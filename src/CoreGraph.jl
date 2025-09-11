@@ -318,9 +318,7 @@ end
 end
 
 # Weight-specific methods
-@inline function edge_weights(g::WeightedGraph)
-    return g.weights
-end
+@inline edge_weights(g::WeightedGraph) = g.weights
 
 @inline Base.@propagate_inbounds function edge_weights(g::WeightedGraph, v::Integer)
     @boundscheck has_vertex(g, v) || throw(BoundsError(g, v))

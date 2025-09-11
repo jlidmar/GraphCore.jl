@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.5.0]
+## [0.5.1]
 
 ### Added
 - **Unified Edge Weight Interface**: Major API enhancement for generic algorithm development
@@ -68,7 +68,7 @@
 - **Graphs.jl Compatibility**: Drop-in replacement for most Graphs.jl functionality
 - **Unified Interface**: All graph types work with the same functions and syntax
 
-[0.5.0]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.5.0
+[0.5.1]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.5.1
 [0.4.4]: https://github.com/jlidmar/GraphCore.jl/releases/tag/v0.4.4
 
 All notable changes to this project will be documented in this file.

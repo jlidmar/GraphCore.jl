@@ -24,6 +24,7 @@ using .TestData
 
     @testset "Advanced Features" begin
         include("test_properties.jl")
+        include("test_edge_weights.jl")
         include("test_mutation.jl")
     end
 

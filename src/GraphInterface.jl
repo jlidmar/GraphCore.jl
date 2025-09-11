@@ -73,9 +73,9 @@ abstract type WeightedGraphInterface{W} <: GraphInterface end
 """
     PropertyGraphInterface{G,V,E} <: GraphInterface
     Abstract interface for property graphs, which support vertex and edge properties.
-    
+
     # Type Parameters
-    - `G<:GraphInterface`: Base graph type (CoreGraph, WeightedGraph, AdjGraph, etc.)  
+    - `G<:GraphInterface`: Base graph type (CoreGraph, WeightedGraph, AdjGraph, etc.)
     - `V`: Vertex property type
     - `E`: Edge property type
 """
@@ -305,69 +305,46 @@ function directed_edge_indices end
 
 Return weights for edges from vertex v, or all edge weights.
 
-**For weighted graphs**: Returns actual edge weights stored in the graph.
-**For unweighted graphs**: Returns an iterator of 1s (mathematical consistency).
+**Performance**: O(1) per vertex for all graph types. Use `neighbor_weights(g, v)` for combined neighbor-weight iteration.
 
-**Important**: Weights are **always directional**, even for undirected graphs.
-This design allows asymmetric weights (e.g., different traversal costs in each direction).
+**Important**: Weights are always directional, even for undirected graphs.
+The i-th weight corresponds to the i-th neighbor in `neighbor_indices(g, v)`.
 
-**Ordering**: The i-th weight corresponds to the i-th neighbor in `neighbor_indices(g, v)`.
-
-# Examples
-```julia
-# Process neighbors with weights. Works for both weighted and unweighted graphs
-for (neighbor, weight) in zip(neighbor_indices(g, v), edge_weights(g, v))
-    process_weighted_edge(v, neighbor, weight)  # weight = 1 for unweighted
-end
-
-# More convenient combined iteration
-for (neighbor, weight) in neighbor_weights(g, v)
-    process_weighted_edge(v, neighbor, weight)
-end
-```
-
-# Algorithm Selection
-For performance-critical algorithms, use `is_weighted_graph(g)` to choose optimal implementation:
-```julia
-if is_weighted_graph(g)
-    dijkstra_shortest_paths(g, source)  # Use actual weights
-else
-    bfs_shortest_paths(g, source)       # More efficient for unweighted
-end
-```
+**For weighted graphs**: Returns actual stored weights.
+**For unweighted graphs**: Returns 1s (mathematical consistency).
 """
 function edge_weights end
 
 """
+    edge_weight(g::GraphInterface, v::Integer, i::Integer) -> W
     edge_weight(g::GraphInterface, directed_edge_idx::Integer) -> W
     edge_weight(g::GraphInterface, edge::Pair{<:Integer,<:Integer}) -> W
 
-Get the weight of the directed edge at the given directed edge index.
+Access edge weights by different methods:
+1. Direct access: `edge_weight(g, v, i)` gets weight to i-th neighbor of v (O(1))
+2. By directed edge index: `edge_weight(g, directed_idx)` (⚠️ O(V) for AdjGraph, O(1) for CoreGraph)
+3. By pair of vertices: `edge_weight(g, u => v)` (uses directed index internally) (not the most efficient)
 
-**For weighted graphs**: Returns the actual stored weight.
-**For unweighted graphs**: Returns 1 (Int32) for mathematical consistency.
+For iterations perefer `edge_weights(g, v)` or `neighbor_weights(g, v)` (most efficient)
 
-Uses the directional indexing system for O(1) weight lookups.
-The second form allows querying by vertex pair, equivalent to `edge_weight(g, find_directed_edge_index(g, u, v))`.
+**Important**: Edge weights use directional indexing (always), unlike edge properties which follow graph directedness.
+
+**For weighted graphs**: Returns actual stored weights.
+**For unweighted graphs**: Returns 1 (mathematical consistency).
 """
 function edge_weight end
 
 """
     neighbor_weights(g::GraphInterface, v::Integer) -> iterator
 
-Return an iterator over `(neighbor_index, weight)` pairs for vertex v.
+Returns `(neighbor, weight)` pairs for vertex v.
 
-**For weighted graphs**: Returns actual edge weights stored in the graph.
-**For unweighted graphs**: Returns weight 1 for all edges (mathematical consistency).
+Most efficient pattern for graph algorithms. O(1) per neighbor for all graph types.
 
-More efficient than separate iteration over `neighbor_indices(g, v)` and `edge_weights(g, v)`.
-
-Usage:
 ```julia
-    for (neighbor, weight) in neighbor_weights(g, v)
-        # process neighbor and weight together
-        # weight = 1 for unweighted graphs
-    end
+for (neighbor, weight) in neighbor_weights(g, v)
+    # Process neighbor and weight together
+end
 ```
 See also: [`neighbor_indices`](@ref), [`edge_weights`](@ref)
 """
@@ -388,8 +365,8 @@ function vertex_property end
 """
     edge_property(g::PropertyGraphInterface, edge_idx::Integer) -> E
 
-Get the property associated with edge at the given edge index.
-Uses undirected edge indexing (1:num_edges).
+Get edge property by edge index (1:num_edges).
+Edge properties follow graph directedness (shared for undirected graphs).
 """
 function edge_property end
 
@@ -499,7 +476,7 @@ function set_edge_weight! end
 
 Add a new isolated vertex to the graph with optional vertex property.
 
-# Returns  
+# Returns
 - Index (Int32) of the newly added vertex
 
 # Behavior
@@ -510,7 +487,7 @@ Add a new isolated vertex to the graph with optional vertex property.
 
 # Type-Specific Performance
 - `CoreGraph`: O(1) - extends vertex arrays
-- `AdjGraph`: O(1) - pushes to vertex arrays  
+- `AdjGraph`: O(1) - pushes to vertex arrays
 - `WeightedGraph`: O(1) - same as base type
 - `PropertyGraph`: O(1) - same as base type + property storage
 
@@ -526,7 +503,7 @@ new_v = add_vertex!(g)  # Returns 3
 add_edge!(g, 1, new_v)  # Connect to existing vertex
 
 # Add vertex with property
-pg = build_graph(PropertyGraph{AdjGraph,String,Nothing}, [(1,2)]; 
+pg = build_graph(PropertyGraph{AdjGraph,String,Nothing}, [(1,2)];
                  directed=false, vertex_properties=["Alice", "Bob"])
 new_v = add_vertex!(pg, "Charlie")  # Returns 3 with property
 ```
@@ -547,7 +524,7 @@ Add an edge from vertex `u` to vertex `v` with optional weight and/or edge prope
 
 # Behavior
 - **Directed graphs**: Adds only u→v edge
-- **Undirected graphs**: Adds both u→v and v→u internally (same edge index)  
+- **Undirected graphs**: Adds both u→v and v→u internally (same edge index)
 - **Index assignment**: New edges get the next available edge index
 - **Duplicate detection**: Checks if edge exists before adding
 - **Index stability**: Existing edge/vertex indices remain valid after addition
@@ -570,11 +547,11 @@ g = build_graph(CoreGraph, [(1,2)]; directed=false)
 edge_idx = add_edge!(g, 1, 3)  # Returns edge index
 
 # Weighted edge
-wg = build_graph(WeightedGraph, [(1,2,1.0)]; directed=true)  
+wg = build_graph(WeightedGraph, [(1,2,1.0)]; directed=true)
 edge_idx = add_edge!(wg, 2, 3, 2.5)  # Add weighted edge
 
 # Property edge
-pg = build_graph(PropertyGraph{AdjGraph,Nothing,String}, [(1,2)]; 
+pg = build_graph(PropertyGraph{AdjGraph,Nothing,String}, [(1,2)];
                  directed=false, edge_properties=["friendship"])
 edge_idx = add_edge!(pg, 1, 3, "colleague")  # Add edge with property
 ```
@@ -623,7 +600,7 @@ success = remove_vertex!(g, 2)  # Remove vertex 2, returns true
 # Vertex 3 is now vertex 2, edges (1,3) becomes (1,2)
 
 # Property graph vertex removal
-pg = build_graph(PropertyGraph{AdjGraph,String,Nothing}, [(1,2), (2,3)]; 
+pg = build_graph(PropertyGraph{AdjGraph,String,Nothing}, [(1,2), (2,3)];
                  directed=false, vertex_properties=["Alice", "Bob", "Charlie"])
 remove_vertex!(pg, 2)  # Removes "Bob", "Charlie" becomes vertex 2
 ```
@@ -679,7 +656,7 @@ remove_edge!(dg, 1, 2)  # Removes only 1→2
 @assert !has_edge(dg, 1, 2) && has_edge(dg, 2, 1)  # 2→1 still exists
 
 # Property graph edge removal
-pg = build_graph(PropertyGraph{AdjGraph,Nothing,String}, [(1,2), (2,3)]; 
+pg = build_graph(PropertyGraph{AdjGraph,Nothing,String}, [(1,2), (2,3)];
                  directed=false, edge_properties=["friend", "colleague"])
 remove_edge!(pg, 1, 2)  # Removes edge and "friend" property
 ```
@@ -911,12 +888,17 @@ end
 
 # Default edge weight methods for unweighted graphs (excludes WeightedGraphInterface)
 @inline edge_weight(g::GraphInterface, ::Integer) = one(Int32)
+@inline edge_weight(g::GraphInterface, ::Integer, ::Integer) = one(Int32)
+@inline edge_weight(g::GraphInterface, ::Union{Tuple{Int,Int},Pair{Int,Int}}) = one(Int32)
 @inline edge_weights(g::GraphInterface, v::Integer) = Iterators.repeated(one(Int32), degree(g, v))
 @inline edge_weights(g::GraphInterface) = Iterators.repeated(one(Int32), num_directed_edges(g))
 
 # Default implementations for weighted graphs (may be overridden for efficiency)
 @inline Base.@propagate_inbounds function edge_weight(g::WeightedGraphInterface, v::Integer, i::Integer)
     return edge_weights(g, v)[i]
+end
+@inline Base.@propagate_inbounds function edge_weight(g::WeightedGraphInterface, directed_indx::Integer)
+    return edge_weights(g)[directed_indx]
 end
 
 # Edge weight access by vertex pairs

@@ -193,12 +193,11 @@ end
 # ==============================================================================
 
 # For weighted PropertyGraphs (base graph is a WeightedGraphInterface) - more specific, takes precedence
-@inline edge_weight(g::PropertyGraph{G,V,E}, directed_edge_idx::Integer) where {G<:GraphInterface,V,E} = edge_weight(g.core, directed_edge_idx)
-@inline edge_weights(g::PropertyGraph{G,V,E}, v::Integer) where {G<:GraphInterface,V,E} = edge_weights(g.core, v)
-@inline edge_weights(g::PropertyGraph{G,V,E}) where {G<:GraphInterface,V,E} = edge_weights(g.core)
-@inline Base.@propagate_inbounds function neighbor_weights(g::PropertyGraph{G,V,E}, v::Integer) where {G<:GraphInterface,V,E}
-    return neighbor_weights(g.core, v)
-end
+@inline Base.@propagate_inbounds edge_weight(g::PropertyGraph{G,V,E}, directed_edge_idx::Integer) where {G<:GraphInterface,V,E} = edge_weight(g.core, directed_edge_idx)
+@inline Base.@propagate_inbounds edge_weight(g::PropertyGraph{G,V,E}, v::Integer, i::Integer) where {G<:WeightedGraphInterface,V,E} = edge_weight(g.core, v, i)
+@inline Base.@propagate_inbounds edge_weights(g::PropertyGraph{G,V,E}, v::Integer) where {G<:GraphInterface,V,E} = edge_weights(g.core, v)
+@inline Base.@propagate_inbounds edge_weights(g::PropertyGraph{G,V,E}) where {G<:GraphInterface,V,E} = edge_weights(g.core)
+@inline Base.@propagate_inbounds neighbor_weights(g::PropertyGraph{G,V,E}, v::Integer) where {G<:GraphInterface,V,E} = neighbor_weights(g.core, v)
 
 # Weight mutation (Available when base weighted graph supports it)
 # Delegates to core set_edge_weight!; see GraphInterface.set_edge_weight! for API docs.
