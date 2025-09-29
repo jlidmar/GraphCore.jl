@@ -889,7 +889,7 @@ end
 # Default edge weight methods for unweighted graphs (excludes WeightedGraphInterface)
 @inline edge_weight(g::GraphInterface, ::Integer) = one(Int32)
 @inline edge_weight(g::GraphInterface, ::Integer, ::Integer) = one(Int32)
-@inline edge_weight(g::GraphInterface, ::Union{Tuple{Int,Int},Pair{Int,Int}}) = one(Int32)
+@inline edge_weight(g::GraphInterface, ::Union{Tuple{<:Integer,<:Integer},Pair{<:Integer,<:Integer}}) = one(Int32)
 @inline edge_weights(g::GraphInterface, v::Integer) = Iterators.repeated(one(Int32), degree(g, v))
 @inline edge_weights(g::GraphInterface) = Iterators.repeated(one(Int32), num_directed_edges(g))
 
@@ -902,7 +902,7 @@ end
 end
 
 # Edge weight access by vertex pairs
-@inline Base.@propagate_inbounds function edge_weight(g::WeightedGraphInterface, e::Union{Tuple{Int,Int},Pair{Int,Int}})
+@inline Base.@propagate_inbounds function edge_weight(g::WeightedGraphInterface, e::Union{Tuple{<:Integer,<:Integer},Pair{<:Integer,<:Integer}})
     (u, v) = e
     directed_idx = find_directed_edge_index(g, u, v)
     directed_idx == 0 && throw(ArgumentError("Edge $e does not exist"))
